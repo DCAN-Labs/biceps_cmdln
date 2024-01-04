@@ -1,0 +1,14 @@
+/panfs/jay/groups/4/miran045/miran045/training/BIDS_fconn_maker/Erik/input_with_variance/fake_ID_01/fake_visit_1
+/panfs/jay/groups/4/miran045/miran045/training/BIDS_fconn_maker/Erik/input_with_variance/fake_ID_02/fake_visit_1
+/panfs/jay/groups/4/miran045/miran045/training/BIDS_fconn_maker/Erik/input_with_variance/fake_ID_03/fake_visit_1
+/panfs/jay/groups/4/miran045/miran045/training/BIDS_fconn_maker/Erik/input_with_variance/fake_ID_04/fake_visit_1
+/panfs/jay/groups/4/miran045/miran045/training/BIDS_fconn_maker/Erik/input_with_variance/fake_ID_05/fake_visit_1
+/panfs/jay/groups/4/miran045/miran045/training/BIDS_fconn_maker/Erik/input_with_variance/fake_ID_06/fake_visit_1
+/panfs/jay/groups/4/miran045/miran045/training/BIDS_fconn_maker/Erik/input_with_variance/fake_ID_07/fake_visit_1
+/panfs/jay/groups/4/miran045/miran045/training/BIDS_fconn_maker/Erik/input_with_variance/fake_ID_08/fake_visit_1
+/panfs/jay/groups/4/miran045/miran045/training/BIDS_fconn_maker/Erik/input_with_variance/fake_ID_09/fake_visit_1
+/panfs/jay/groups/4/miran045/miran045/training/BIDS_fconn_maker/Erik/input_with_variance/fake_ID_10/fake_visit_1
+/panfs/jay/groups/4/miran045/miran045/training/BIDS_fconn_maker/Erik/input_with_variance/fake_ID_11/fake_visit_1
+/panfs/jay/groups/4/miran045/miran045/training/BIDS_fconn_maker/Erik/input_with_variance/fake_ID_12/fake_visit_1
+/panfs/jay/groups/4/miran045/miran045/training/BIDS_fconn_maker/Erik/input_with_variance/fake_ID_13/fake_visit_1
+/panfs/jay/groups/4/miran045/miran045/training/BIDS_fconn_maker/Erik/input_with_variance/fake_ID_14/fake_visit_1
