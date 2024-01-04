@@ -32,10 +32,10 @@ The remaining three matrices will differ by the number of frames used to generat
 underlying matrices. The three types are:
  
 * MaxIndividual - where all good frames that an individual has will be used to construct connectivity matrix.  
-* MinGroup - where only the minimum requirement for number of frames will be used. For example if 5 min is required ..
+* MinGroup - where only the minimum requirement for number of frames will be used. For example if 5 min is required..
 and the TR is 2 seconds, only 150 frames (30*5) will be used for each run.
-* MaxGroup - where the maximum number of frames are used that allows for a consistent number of frames across runs. ..
-For example if the worst run in the group has 160 frames, then 160 frames will be used as a threshold for all other ..
+* MaxGroup - where the maximum number of frames are used that allows for a consistent number of frames across runs...
+For example if the worst run in the group has 160 frames, then 160 frames will be used as a threshold for all other..
 runs in the study.
 
 From the above description it is seen that the MaxGroup type connectivity matrices will  
