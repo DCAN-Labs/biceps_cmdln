@@ -165,7 +165,7 @@ Arguments
 | **Positional:**
 |
 | **input** - if not provided, biceps_cmdln will open to the GUI. If provided this can either be a file list or path to a study directory that should be parsed.
-
+|
 | **Optional:**
 |
 | **-fd**: float. The framewise displacement threshold in mm, default value 0.2.
