@@ -55,11 +55,11 @@ details.
 
 
 
-```bash 
+``` bash 
 input_denoised_dir=/path/to/fmri/processing_output/
 biceps_output_dir=/path/to/directory/for/biceps/output/
 container_path=/path/to/biceps/singularity/container.sif
-singularity run -B $input_denoised_dir:/input \
+singularity run -B $input_denoised_dir:/input \  
 -B $biceps_output_dir:/output $container_path
 ```
 
