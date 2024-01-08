@@ -167,21 +167,21 @@ Arguments
 be a file list or path to a study directory that should be parsed.
 
 **Optional:**
-**-fd**: float. The framewise displacement threshold in mm, default value 0.2.
-**-minutes**: float. The minimum amount of data a subject must have to be included in processing, measured in minutes. Default value = 8 min.
-**-outlier**: boolean. Whether to remove outliers, default true
-**-out_dir**: string. Path to where BICEPS output should be stored. Default option is in current working directory.
-**-save_bids**: int. Set to a positive number if you want the output to be saved in BIDS on top of standard BICEPS output format. Default is to not save in this way.
-**-validate_frame_counts**: int. Set to a positive number if you want to validate that all runs have the same number of frames.
-**-n_skip_vols**: int. The number of frames to skip at the beginning of every scan. Default is 5.
-**-save_timeseries**: int. Set to positive value if you want to save the timeseries.
-**-wb_command_path**: string. Set the path to wb_command from HCP. By default BICEPS will try to find this path on its own.
-**-make_dense_conns**: int. Set to positive number to make dconn files from dtseries.
-**-dtseries_smoothing**: float. The amount of smoothing to use, for both surface and volume space, in millimeters (sigma of gaussian kernel). This only is used if -make_dense_conns flag is activated.
-**-left_hem_surface**: string. The path to the left hemisphere to use for smoothing. If -dtseries_smoothing > 0 and no input is provided here, smoothing will use the default fslr midthicknes file stored in BICEPS. It is better for this to point to the actual midthickness file for a given subject. If that is the case, processing can only occur one subject at a time since it is only possible to give inputs for one surface.
-**-right_hem_surface**: string. The path to the right hemisphere to use for smoothing. See description from left_hem_surface for more info.
-**-attempt_pconn**: 0 or 1, default 0 Set to 1 if you want BICEPS to try making .pconn.nii files out of the generated connectivity matrices. Default = 0
-**-custom_dtvar_folder**: string. If an empty string is provided (i.e. ''), BICEPS will produce look for dtvariance files found next to the the ptseries files. If dtvariance files are not found at this location, you can provide the path to a folder where all dtvariance files are found directly within the folder specified (i.e. NOT BIDS organized)
+**-fd**: float. The framewise displacement threshold in mm, default value 0.2.  
+**-minutes**: float. The minimum amount of data a subject must have to be included in processing, measured in minutes. Default value = 8 min.  
+**-outlier**: boolean. Whether to remove outliers, default true  
+**-out_dir**: string. Path to where BICEPS output should be stored. Default option is in current working directory.  
+**-save_bids**: int. Set to a positive number if you want the output to be saved in BIDS on top of standard BICEPS output format. Default is to not save in this way.  
+**-validate_frame_counts**: int. Set to a positive number if you want to validate that all runs have the same number of frames.  
+**-n_skip_vols**: int. The number of frames to skip at the beginning of every scan. Default is 5.  
+**-save_timeseries**: int. Set to positive value if you want to save the timeseries.  
+**-wb_command_path**: string. Set the path to wb_command from HCP. By default BICEPS will try to find this path on its own.  
+**-make_dense_conns**: int. Set to positive number to make dconn files from dtseries.  
+**-dtseries_smoothing**: float. The amount of smoothing to use, for both surface and volume space, in millimeters (sigma of gaussian kernel). This only is used if -make_dense_conns flag is activated.  
+**-left_hem_surface**: string. The path to the left hemisphere to use for smoothing. If -dtseries_smoothing > 0 and no input is provided here, smoothing will use the default fslr midthicknes file stored in BICEPS. It is better for this to point to the actual midthickness file for a given subject. If that is the case, processing can only occur one subject at a time since it is only possible to give inputs for one surface.  
+**-right_hem_surface**: string. The path to the right hemisphere to use for smoothing. See description from left_hem_surface for more info.  
+**-attempt_pconn**: 0 or 1, default 0 Set to 1 if you want BICEPS to try making .pconn.nii files out of the generated connectivity matrices. Default = 0  
+**-custom_dtvar_folder**: string. If an empty string is provided (i.e. ''), BICEPS will produce look for dtvariance files found next to the the ptseries files. If dtvariance files are not found at this location, you can provide the path to a folder where all dtvariance files are found directly within the folder specified (i.e. NOT BIDS organized)  
 
 
 Indices and tables
