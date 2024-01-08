@@ -92,7 +92,106 @@ $ singularity run \
     $container_path
 </pre></div>
 </div>
-<p>Hello hello hello</p>
+</div>
+<div class="section" id="running-biceps-cmdln-using-an-input-folder-with-processed-fmri-data">
+<h2>Running biceps_cmdln using an input folder with processed fmri data<a class="headerlink" href="#running-biceps-cmdln-using-an-input-folder-with-processed-fmri-data" title="Permalink to this headline">¶</a></h2>
+<p>The recommended way of running biceps_cmdln is to have a directory of
+processed fMRI data that is formatted roughly as “BIDS Derivatives”.
+The exact formatting requirements can be seen later in this document.
+During processing, the user is able to pass an input and output directory,
+and biceps_cmdln will identify which data to process based on organizational
+assumptions. The code to run this is as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ input_denoised_dir=/path/to/fmri/processing_output/
+$ biceps_output_dir=/path/to/directory/for/biceps/output/
+$ container_path=/path/to/biceps/singularity/container.sif
+$ singularity run \
+    -B $input_denoised_dir:/input \
+    -B $biceps_output_dir:/output \
+    $container_path /input \
+    -out_dir /output
+</pre></div>
+</div>
+</div>
+<div class="section" id="running-biceps-cmdln-using-an-input-file-list-pointing-to-sessions">
+<h2>Running biceps_cmdln using an input file list pointing to sessions<a class="headerlink" href="#running-biceps-cmdln-using-an-input-file-list-pointing-to-sessions" title="Permalink to this headline">¶</a></h2>
+<p>If you have a directory with processed fMRI data and you want to
+exclude one or more subjects or sessions from biceps_cmdln processing,
+then you may want to run biceps_cmdln by passing the tool a file list
+instead of a folder. This file list should be a plain text file having
+one entry per line, where each line points to a session directory that
+should be included in biceps_cmdln attempts to calculate functional
+connectivity matrices.</p>
+<p>One line of this file is likely to look something like:
+/study_dir/sub-01/ses-01/</p>
+<p>When running processing, you will want to remember to bind
+the input directory where the processed fmri data is stored,
+the output directory where results will be stored, and the path
+to the file list. Importantly, if the binding of the input directory
+changes what the container thinks the paths to the input files are, then
+this difference should be reflected in the file list. So the example
+line listed above might instead need to be something like:
+/input/sub-01/ses-01</p>
+<p>If the input file list refers to data from multiple input directories,
+then be sure to bind each input directory to a unique name in the container.</p>
+<p>Example code for base case of using file list to run biceps_cmdln:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ input_denoised_dir=/path/to/fmri/processing_output/
+$ biceps_output_dir=/path/to/directory/for/biceps/output/
+$ file_list=/path/to/file_list.txt
+$ container_path=/path/to/biceps/singularity/container.sif
+$ singularity run \
+    -B $input_denoised_dir:/input \
+    -B $biceps_output_dir:/output \
+    -B $file_list:/file/list.txt \
+    $container_path /file/list.txt \
+    -out_dir /output
+</pre></div>
+</div>
+</div>
+<div class="section" id="organization-requirements-for-running-biceps-cmdln">
+<h2>Organization requirements for running biceps_cmdln<a class="headerlink" href="#organization-requirements-for-running-biceps-cmdln" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>General BIDS Derivatives structure with session folders.</p></li>
+</ol>
+<p>For biceps_cmdln to be able to parse files correctly there needs
+to first be a BIDS Derivatives-like study folder. This study folder
+should contain different subject folders. Below each subject folder
+it is required for there to be session folders and then func folders
+containing denoised fMRI data. While it is generally BIDS acceptable
+for data to be organized either with or without a session structure,
+biceps_cmdln requires there to be a session structure. An example of
+the file structure for a given subject and session may look like:</p>
+<p>/study_dir/sub-01/ses-01/func/</p>
+<ol class="arabic simple" start="2">
+<li><p>ptseries.nii files for each subject/session.</p></li>
+</ol>
+<p>Each session and subject that will be processed should have at least one
+file with extension “ptseries.nii”. The ptseries file must have a key-value
+pair such as “<em>_roi-Gordon2014FreeSurferSubcortical_</em>” in the name. The
+underscores, roi key, and dash will let biceps_cmdln figure out which
+parcellations are available in the input dataset. For each parcellation scheme
+biceps_cmdln will calculate a set of connectivity matrices.</p>
+</div>
+<div class="section" id="arguments">
+<h2>Arguments<a class="headerlink" href="#arguments" title="Permalink to this headline">¶</a></h2>
+<p><strong>Positional:</strong> <a href="#id1"><span class="problematic" id="id2">|br|</span></a>
+<strong>input</strong> - if not provided, biceps_cmdln will open to the GUI. If provided this can either
+be a file list or path to a study directory that should be parsed. <a href="#id3"><span class="problematic" id="id4">|br|</span></a></p>
+<p><strong>Optional:</strong> <a href="#id5"><span class="problematic" id="id6">|br|</span></a>
+<strong>-fd</strong>: float. The framewise displacement threshold in mm, default value 0.2. <a href="#id7"><span class="problematic" id="id8">|br|</span></a>
+<strong>-minutes</strong>: float. The minimum amount of data a subject must have to be included in processing, measured in minutes. Default value = 8 min.
+<strong>-outlier</strong>: boolean. Whether to remove outliers, default true
+<strong>-out_dir</strong>: string. Path to where BICEPS output should be stored. Default option is in current working directory.
+<strong>-save_bids</strong>: int. Set to a positive number if you want the output to be saved in BIDS on top of standard BICEPS output format. Default is to not save in this way.
+<strong>-validate_frame_counts</strong>: int. Set to a positive number if you want to validate that all runs have the same number of frames.
+<strong>-n_skip_vols</strong>: int. The number of frames to skip at the beginning of every scan. Default is 5.
+<strong>-save_timeseries</strong>: int. Set to positive value if you want to save the timeseries.
+<strong>-wb_command_path</strong>: string. Set the path to wb_command from HCP. By default BICEPS will try to find this path on its own.
+<strong>-make_dense_conns</strong>: int. Set to positive number to make dconn files from dtseries.
+<strong>-dtseries_smoothing</strong>: float. The amount of smoothing to use, for both surface and volume space, in millimeters (sigma of gaussian kernel). This only is used if -make_dense_conns flag is activated.
+<strong>-left_hem_surface</strong>: string. The path to the left hemisphere to use for smoothing. If -dtseries_smoothing &gt; 0 and no input is provided here, smoothing will use the default fslr midthicknes file stored in BICEPS. It is better for this to point to the actual midthickness file for a given subject. If that is the case, processing can only occur one subject at a time since it is only possible to give inputs for one surface.
+<strong>-right_hem_surface</strong>: string. The path to the right hemisphere to use for smoothing. See description from left_hem_surface for more info.
+<strong>-attempt_pconn</strong>: 0 or 1, default 0 Set to 1 if you want BICEPS to try making .pconn.nii files out of the generated connectivity matrices. Default = 0
+<strong>-custom_dtvar_folder</strong>: string. If an empty string is provided (i.e. ‘’), BICEPS will produce look for dtvariance files found next to the the ptseries files. If dtvariance files are not found at this location, you can provide the path to a folder where all dtvariance files are found directly within the folder specified (i.e. NOT BIDS organized)</p>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
