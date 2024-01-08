@@ -163,7 +163,7 @@ Arguments
 |
 | **input** - if not provided, biceps_cmdln will open to the GUI. If provided this can either be a file list or path to a study directory that should be parsed.
 |
-| **Optional:**
+| **Flag Key/Value Pairs:**
 |
 | **-fd**: float. The framewise displacement threshold in mm, default value 0.2.
 | **-minutes**: float. The minimum amount of data a subject must have to be included in processing, measured in minutes. Default value = 8 min.  
