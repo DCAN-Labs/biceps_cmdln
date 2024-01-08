@@ -73,9 +73,89 @@ where any data is stored prior to running biceps_cmdln: ::
         -B $biceps_output_dir:/output \
         $container_path
 
-Hello hello hello
+Running biceps_cmdln using an input folder with processed fmri data
+--------------------------------------------------------------------
+
+The recommended way of running biceps_cmdln is to have a directory of
+processed fMRI data that is formatted roughly as "BIDS Derivatives".
+The exact formatting requirements can be seen later in this document.
+During processing, the user is able to pass 
+
+    $ input_denoised_dir=/path/to/fmri/processing_output/
+    $ biceps_output_dir=/path/to/directory/for/biceps/output/
+    $ container_path=/path/to/biceps/singularity/container.sif
+    $ singularity run \
+        -B $input_denoised_dir:/input \
+        -B $biceps_output_dir:/output \
+        $container_path /input \
+        -out_dir /output
 
 
+Running biceps_cmdln using an input file list pointing to sessions
+------------------------------------------------------------------
+
+If you have a directory with processed fMRI data and you want to
+exclude one or more subjects or sessions from biceps_cmdln processing,
+then you may want to run biceps_cmdln by passing the tool a file list
+instead of a folder. This file list should be a plain text file having 
+one entry per line, where each line points to a session directory that 
+should be included in biceps_cmdln attempts to calculate functional 
+connectivity matrices. 
+
+One line of this file is likely to look something like:
+/study_dir/sub-01/ses-01/
+
+When running processing, you will want to remember to bind
+the input directory where the processed fmri data is stored,
+the output directory where results will be stored, and the path
+to the file list. Importantly, if the binding of the input directory
+changes what the container thinks the paths to the input files are, then
+this difference should be reflected in the file list. So the example
+line listed above might instead need to be something like:
+/input/sub-01/ses-01
+
+If the input file list refers to data from multiple input directories,
+then be sure to bind each input directory to a unique name in the container.
+
+Example code for base case of using file list to run biceps_cmdln: ::
+
+    $ input_denoised_dir=/path/to/fmri/processing_output/
+    $ biceps_output_dir=/path/to/directory/for/biceps/output/
+    $ file_list=/path/to/file_list.txt
+    $ container_path=/path/to/biceps/singularity/container.sif
+    $ singularity run \
+        -B $input_denoised_dir:/input \
+        -B $biceps_output_dir:/output \
+        -B $file_list:/file/list.txt \
+        $container_path /file/list.txt \
+        -out_dir /output
+
+
+
+Organization requirements for running biceps_cmdln
+--------------------------------------------------
+
+1. General BIDS Derivatives structure with session folders.
+
+For biceps_cmdln to be able to parse files correctly there needs
+to first be a BIDS Derivatives-like study folder. This study folder
+should contain different subject folders. Below each subject folder
+it is required for there to be session folders and then func folders
+containing denoised fMRI data. While it is generally BIDS acceptable
+for data to be organized either with or without a session structure,
+biceps_cmdln requires there to be a session structure. An example of
+the file structure for a given subject and session may look like:
+
+/study_dir/sub-01/ses-01/func/
+
+2. ptseries.nii files for each subject/session.
+
+Each session and subject that will be processed should have at least one
+file with extension "ptseries.nii". The ptseries file must have a key-value
+pair such as "*_roi-Gordon2014FreeSurferSubcortical_*" in the name. The
+underscores, roi key, and dash will let biceps_cmdln figure out which
+parcellations are available in the input dataset. For each parcellation scheme
+biceps_cmdln will calculate a set of connectivity matrices. 
 
 Indices and tables
 ==================
