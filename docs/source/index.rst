@@ -162,12 +162,12 @@ biceps_cmdln will calculate a set of connectivity matrices.
 Arguments
 ---------
 
-**Positional:**|br|
+**Positional:** |br|
 **input** - if not provided, biceps_cmdln will open to the GUI. If provided this can either
-be a file list or path to a study directory that should be parsed.|br|
+be a file list or path to a study directory that should be parsed. |br|
 
-**Optional:**|br|
-**-fd**: float. The framewise displacement threshold in mm, default value 0.2.|br|
+**Optional:** |br|
+**-fd**: float. The framewise displacement threshold in mm, default value 0.2. |br|
 **-minutes**: float. The minimum amount of data a subject must have to be included in processing, measured in minutes. Default value = 8 min.  
 **-outlier**: boolean. Whether to remove outliers, default true  
 **-out_dir**: string. Path to where BICEPS output should be stored. Default option is in current working directory.  
