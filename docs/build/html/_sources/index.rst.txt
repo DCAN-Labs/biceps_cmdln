@@ -55,13 +55,23 @@ details.
 
 
 
-``` bash 
-input_denoised_dir=/path/to/fmri/processing_output/
-biceps_output_dir=/path/to/directory/for/biceps/output/
-container_path=/path/to/biceps/singularity/container.sif
-singularity run -B $input_denoised_dir:/input \  
--B $biceps_output_dir:/output $container_path
-```
+Starting biceps_cmdln as GUI application
+----------------------------------------
+
+It is still possible to run biceps as a GUI application, which supports
+legacy application of biceps_cmdln's parent tool "BICEPS". Full documentation
+of the BICEPS GUI can be seen [HERE](https://gui-environments-documentation.readthedocs.io/en/latest/GUI_environments/).
+Because singularity containers are only able to look at paths that are specified by the user
+at the time the container is ran, it is still necessary to "bind" the input and output directories
+where any data is stored prior to running biceps_cmdln: ::
+
+    $ input_denoised_dir=/path/to/fmri/processing_output/
+    $ biceps_output_dir=/path/to/directory/for/biceps/output/
+    $ container_path=/path/to/biceps/singularity/container.sif
+    $ singularity run \
+        -B $input_denoised_dir:/input \
+        -B $biceps_output_dir:/output \
+        $container_path
 
 Hello hello hello
 

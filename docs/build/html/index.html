@@ -74,13 +74,24 @@ files and .dtseries.nii files must be present for every subject if you want to c
 frames will be included/excluded for calculating connectivity matrices from .ptseries.nii files will also
 be applied to the .dtseries.nii file. See “Calculating Dense Connectivity Matrices” section for more
 details.</p>
-<p><code class="docutils literal notranslate"><span class="pre">`</span> <span class="pre">bash</span>
-<span class="pre">input_denoised_dir=/path/to/fmri/processing_output/</span>
-<span class="pre">biceps_output_dir=/path/to/directory/for/biceps/output/</span>
-<span class="pre">container_path=/path/to/biceps/singularity/container.sif</span>
-<span class="pre">singularity</span> <span class="pre">run</span> <span class="pre">-B</span> <span class="pre">$input_denoised_dir:/input</span> <span class="pre">\</span>
-<span class="pre">-B</span> <span class="pre">$biceps_output_dir:/output</span> <span class="pre">$container_path</span>
-<span class="pre">`</span></code></p>
+</div>
+<div class="section" id="starting-biceps-cmdln-as-gui-application">
+<h2>Starting biceps_cmdln as GUI application<a class="headerlink" href="#starting-biceps-cmdln-as-gui-application" title="Permalink to this headline">¶</a></h2>
+<p>It is still possible to run biceps as a GUI application, which supports
+legacy application of biceps_cmdln’s parent tool “BICEPS”. Full documentation
+of the BICEPS GUI can be seen [HERE](<a class="reference external" href="https://gui-environments-documentation.readthedocs.io/en/latest/GUI_environments/">https://gui-environments-documentation.readthedocs.io/en/latest/GUI_environments/</a>).
+Because singularity containers are only able to look at paths that are specified by the user
+at the time the container is ran, it is still necessary to “bind” the input and output directories
+where any data is stored prior to running biceps_cmdln:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ input_denoised_dir=/path/to/fmri/processing_output/
+$ biceps_output_dir=/path/to/directory/for/biceps/output/
+$ container_path=/path/to/biceps/singularity/container.sif
+$ singularity run \
+    -B $input_denoised_dir:/input \
+    -B $biceps_output_dir:/output \
+    $container_path
+</pre></div>
+</div>
 <p>Hello hello hello</p>
 </div>
 </div>

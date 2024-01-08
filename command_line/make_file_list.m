@@ -10,6 +10,10 @@ function make_file_list(input_bids_directory, output_file_list_path)
 
 %find all the ptseries files in the input directory whether or not the
 %input directory has session structure
+if input_bids_directory(end) == filesep
+    input_bids_directory = input_bids_directory(1:(end-1));
+end
+
 output_files = dir([input_bids_directory filesep '*' filesep '*' filesep '*' filesep 'func' filesep '*.ptseries.nii']);
 if length(output_files) == 0
     output_files = dir([input_bids_directory filesep '*' filesep '*' filesep 'func' filesep '*.ptseries.nii']);
