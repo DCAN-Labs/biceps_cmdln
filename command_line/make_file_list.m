@@ -14,9 +14,9 @@ if input_bids_directory(end) == filesep
     input_bids_directory = input_bids_directory(1:(end-1));
 end
 
-output_files = dir([input_bids_directory filesep '*' filesep '*' filesep '*' filesep 'func' filesep '*.ptseries.nii']);
+output_files = dir([input_bids_directory filesep '*' filesep '*' filesep 'func' filesep '*.ptseries.nii']);
 if length(output_files) == 0
-    output_files = dir([input_bids_directory filesep '*' filesep '*' filesep 'func' filesep '*.ptseries.nii']);
+    output_files = dir([input_bids_directory filesep '*' filesep 'func' filesep '*.ptseries.nii']);
 end
 
 %Confirm that the directory actually has any ptseries files
