@@ -44,6 +44,25 @@ biceps_cmdln are generally expected to change upon reprocessing even if the same
 given as input. This is expected behavior because the individual frames in the MinGroup and 
 MaxGroup cases will be randomly selected among high quality frames for a given run.
 
+Beyond calculating functional connectivity matrices based on .ptseries.nii files, biceps_cmdln
+can also be used to calculate .dconn.nii files from .dtseries.nii files. Because the file 
+selection algorithm behind biceps_cmdln utilizes .ptseries.nii files to operate, both .ptseries.nii
+files and .dtseries.nii files must be present for every subject if you want to calculate so-called
+"dense" connectivity matrices. During this procedure the same temporal mask that determines which
+frames will be included/excluded for calculating connectivity matrices from .ptseries.nii files will also
+be applied to the .dtseries.nii file. See "Calculating Dense Connectivity Matrices" section for more
+details.
+
+
+
+```bash 
+input_denoised_dir=/path/to/fmri/processing_output/
+biceps_output_dir=/path/to/directory/for/biceps/output/
+container_path=/path/to/biceps/singularity/container.sif
+singularity run -B $input_denoised_dir:/input \
+-B $biceps_output_dir:/output $container_path
+```
+
 Hello hello hello
 
 
