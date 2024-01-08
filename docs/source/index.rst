@@ -79,7 +79,9 @@ Running biceps_cmdln using an input folder with processed fmri data
 The recommended way of running biceps_cmdln is to have a directory of
 processed fMRI data that is formatted roughly as "BIDS Derivatives".
 The exact formatting requirements can be seen later in this document.
-During processing, the user is able to pass 
+During processing, the user is able to pass an input and output directory,
+and biceps_cmdln will identify which data to process based on organizational
+assumptions. The code to run this is as follows: ::
 
     $ input_denoised_dir=/path/to/fmri/processing_output/
     $ biceps_output_dir=/path/to/directory/for/biceps/output/
