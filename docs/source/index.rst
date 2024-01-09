@@ -143,9 +143,9 @@ Organization requirements for running biceps_cmdln
     containing denoised fMRI data. While it is generally BIDS acceptable
     for data to be organized either with or without a session structure,
     biceps_cmdln requires there to be a session structure. An example of
-    the file structure for a given subject and session may look like:
+    the file structure for a given subject and session may look like:  
 
-/study_dir/sub-01/ses-01/func/
+    /study_dir/sub-01/ses-01/func/
 
 2. ptseries.nii files for each subject/session.
 
@@ -169,6 +169,10 @@ Organization requirements for running biceps_cmdln
     level of the directory. This directory can be passed to biceps_cmdln via the custom_dtvar_folder
     argument. Note - even if the user does not want to remove outliers (i.e. if outlier flag is given
     a value of 0), these "_variance.txt" files must still be provided during processing.
+
+4. A biceps_cmdln compatible file with motion and TR information.
+
+  * 
 
 Arguments
 ---------
