@@ -202,6 +202,9 @@ Arguments
 |
 | **Flag Key/Value Pairs:**
 |
+Each of the following arguments are formatted as key/value pairs where the flag should
+always be followed a value describing what action should be applied with the given flag.
+|
 | **-out_dir**: string. Path to where BICEPS output should be stored. Default option is in current working directory. Remember to bind this path if using the singularity version of the tool.    
 |
 | **-save_bids**: int. Set to a positive number if you want the output to be saved in BIDS on top of standard BICEPS output format. Default is to not save in this way.  
@@ -308,6 +311,21 @@ list described in the last paragraph.
 BIDS formatting
 ---------------
 
+If the option save_bids is enabled during processing, there will also be a "bids" folder that
+will be made under the output directory adjacent to the "standard" directory described in the
+last section. Under the "bids" folder will be subject, session, and func folders, followed by
+specific files for a given session that were generated during processing. An example of a
+subject folder structure under "bids" is seen below. For each parcellation there will be files
+for the three different frame sampling schemes, and .mat and .json files containing the underlying
+connectivity data and the settings used to generate those connectivity estimates, respectively.
+
+All the .mat files will contain an "ind_fconn" variable that is <m,m>, where m is the number
+of regions in the parcellation. 
+
+The json files corresponding to a given .mat file will have metadata including the subject/session info,
+the frames used during processing, the total number of included and excluded frames, along with processing
+details like the framewise displacement threshold, and number of skip volumes applied at the beginning of
+the scan.
 
 - ── sub-01
     - ──  ses-01
