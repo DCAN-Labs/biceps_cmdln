@@ -239,9 +239,9 @@ will be one folder for each parcellation present in the input dataset.
     - ── list_with_variance_MCMethod_power_2014_FD_only_FD_th_0_20_min_frames_600_skip_frames_5_TRseconds_0_80
         - ── frame_removal_mask.mat
         - ── Gordon2014FreeSurferSubcortical_timeseries.ptseries
-        -    ├── fconn_600_frames.mat
-        -    ├── fconn_820_frames.mat
-        -    └── fconn_all_surv_frames.mat
+            - ── fconn_600_frames.mat
+            - ── fconn_820_frames.mat
+            - ── fconn_all_surv_frames.mat
         - ── HCP2016FreeSurferSubcortical_timeseries.ptseries
             - ── fconn_600_frames.mat
             - ── fconn_820_frames.mat
