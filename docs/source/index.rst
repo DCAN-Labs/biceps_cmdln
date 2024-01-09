@@ -58,7 +58,7 @@ Starting biceps_cmdln as GUI application
 
 It is still possible to run biceps as a GUI application, which supports
 legacy application of biceps_cmdln's parent tool "BICEPS". Full documentation
-of the BICEPS GUI can be seen [HERE](https://gui-environments-documentation.readthedocs.io/en/latest/GUI_environments/).
+of the BICEPS GUI can be seen `here <https://gui-environments-documentation.readthedocs.io/en/latest/GUI_environments/>`_.
 Because singularity containers are only able to look at paths that are specified by the user
 at the time the container is ran, it is still necessary to "bind" the input and output directories
 where any data is stored prior to running biceps_cmdln: ::
@@ -231,3 +231,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
