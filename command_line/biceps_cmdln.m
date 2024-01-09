@@ -92,6 +92,8 @@ function biceps_cmdln(varargin)
 %
 %
 
+disp('Starting up BICEPS!')
+
 %Run via GUI
 if nargin == 0
     biceps_subf_inserted;

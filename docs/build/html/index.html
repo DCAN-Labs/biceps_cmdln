@@ -55,12 +55,9 @@ The remaining three matrices will differ by the number of frames used to generat
 underlying matrices. The three types are:</p>
 <ul class="simple">
 <li><p>MaxIndividual - where all good frames that an individual has will be used to construct connectivity matrix.</p></li>
-<li><p>MinGroup - where only the minimum requirement for number of frames will be used. For example if 5 min is required..</p></li>
+<li><p>MinGroup - where only the minimum requirement for number of frames will be used. For example if 5 min is required and the TR is 2 seconds, only 150 frames (30*5) will be used for each run.</p></li>
+<li><p>MaxGroup - where the maximum number of frames are used that allows for a consistent number of frames across runs. For example if the worst run in the group has 160 frames, then 160 frames will be used as a threshold for all other runs in the study.</p></li>
 </ul>
-<p>and the TR is 2 seconds, only 150 frames (30*5) will be used for each run.
-* MaxGroup - where the maximum number of frames are used that allows for a consistent number of frames across runs…
-For example if the worst run in the group has 160 frames, then 160 frames will be used as a threshold for all other..
-runs in the study.</p>
 <p>From the above description it is seen that the MaxGroup type connectivity matrices will
 change as a function of which runs are included in the study. In general, the results of
 biceps_cmdln are generally expected to change upon reprocessing even if the same runs are
@@ -173,25 +170,29 @@ biceps_cmdln will calculate a set of connectivity matrices.</p>
 </div>
 <div class="section" id="arguments">
 <h2>Arguments<a class="headerlink" href="#arguments" title="Permalink to this headline">¶</a></h2>
-<p><strong>Positional:</strong> <a href="#id1"><span class="problematic" id="id2">|br|</span></a>
-<strong>input</strong> - if not provided, biceps_cmdln will open to the GUI. If provided this can either
-be a file list or path to a study directory that should be parsed. <a href="#id3"><span class="problematic" id="id4">|br|</span></a></p>
-<p><strong>Optional:</strong> <a href="#id5"><span class="problematic" id="id6">|br|</span></a>
-<strong>-fd</strong>: float. The framewise displacement threshold in mm, default value 0.2. <a href="#id7"><span class="problematic" id="id8">|br|</span></a>
-<strong>-minutes</strong>: float. The minimum amount of data a subject must have to be included in processing, measured in minutes. Default value = 8 min.
-<strong>-outlier</strong>: boolean. Whether to remove outliers, default true
-<strong>-out_dir</strong>: string. Path to where BICEPS output should be stored. Default option is in current working directory.
-<strong>-save_bids</strong>: int. Set to a positive number if you want the output to be saved in BIDS on top of standard BICEPS output format. Default is to not save in this way.
-<strong>-validate_frame_counts</strong>: int. Set to a positive number if you want to validate that all runs have the same number of frames.
-<strong>-n_skip_vols</strong>: int. The number of frames to skip at the beginning of every scan. Default is 5.
-<strong>-save_timeseries</strong>: int. Set to positive value if you want to save the timeseries.
-<strong>-wb_command_path</strong>: string. Set the path to wb_command from HCP. By default BICEPS will try to find this path on its own.
-<strong>-make_dense_conns</strong>: int. Set to positive number to make dconn files from dtseries.
-<strong>-dtseries_smoothing</strong>: float. The amount of smoothing to use, for both surface and volume space, in millimeters (sigma of gaussian kernel). This only is used if -make_dense_conns flag is activated.
-<strong>-left_hem_surface</strong>: string. The path to the left hemisphere to use for smoothing. If -dtseries_smoothing &gt; 0 and no input is provided here, smoothing will use the default fslr midthicknes file stored in BICEPS. It is better for this to point to the actual midthickness file for a given subject. If that is the case, processing can only occur one subject at a time since it is only possible to give inputs for one surface.
-<strong>-right_hem_surface</strong>: string. The path to the right hemisphere to use for smoothing. See description from left_hem_surface for more info.
-<strong>-attempt_pconn</strong>: 0 or 1, default 0 Set to 1 if you want BICEPS to try making .pconn.nii files out of the generated connectivity matrices. Default = 0
-<strong>-custom_dtvar_folder</strong>: string. If an empty string is provided (i.e. ‘’), BICEPS will produce look for dtvariance files found next to the the ptseries files. If dtvariance files are not found at this location, you can provide the path to a folder where all dtvariance files are found directly within the folder specified (i.e. NOT BIDS organized)</p>
+<div class="line-block">
+<div class="line"><strong>Positional:</strong></div>
+<div class="line"><br /></div>
+<div class="line"><strong>input</strong> - if not provided, biceps_cmdln will open to the GUI. If provided this can either be a file list or path to a study directory that should be parsed.</div>
+<div class="line"><br /></div>
+<div class="line"><strong>Optional:</strong></div>
+<div class="line"><br /></div>
+<div class="line"><strong>-fd</strong>: float. The framewise displacement threshold in mm, default value 0.2.</div>
+<div class="line"><strong>-minutes</strong>: float. The minimum amount of data a subject must have to be included in processing, measured in minutes. Default value = 8 min.</div>
+<div class="line"><strong>-outlier</strong>: boolean. Whether to remove outliers, default true</div>
+<div class="line"><strong>-out_dir</strong>: string. Path to where BICEPS output should be stored. Default option is in current working directory.</div>
+<div class="line"><strong>-save_bids</strong>: int. Set to a positive number if you want the output to be saved in BIDS on top of standard BICEPS output format. Default is to not save in this way.</div>
+<div class="line"><strong>-validate_frame_counts</strong>: int. Set to a positive number if you want to validate that all runs have the same number of frames.</div>
+<div class="line"><strong>-n_skip_vols</strong>: int. The number of frames to skip at the beginning of every scan. Default is 5.</div>
+<div class="line"><strong>-save_timeseries</strong>: int. Set to positive value if you want to save the timeseries.</div>
+<div class="line"><strong>-wb_command_path</strong>: string. Set the path to wb_command from HCP. By default BICEPS will try to find this path on its own.</div>
+<div class="line"><strong>-make_dense_conns</strong>: int. Set to positive number to make dconn files from dtseries.</div>
+<div class="line"><strong>-dtseries_smoothing</strong>: float. The amount of smoothing to use, for both surface and volume space, in millimeters (sigma of gaussian kernel). This only is used if -make_dense_conns flag is activated.</div>
+<div class="line"><strong>-left_hem_surface</strong>: string. The path to the left hemisphere to use for smoothing. If -dtseries_smoothing &gt; 0 and no input is provided here, smoothing will use the default fslr midthicknes file stored in BICEPS. It is better for this to point to the actual midthickness file for a given subject. If that is the case, processing can only occur one subject at a time since it is only possible to give inputs for one surface.</div>
+<div class="line"><strong>-right_hem_surface</strong>: string. The path to the right hemisphere to use for smoothing. See description from left_hem_surface for more info.</div>
+<div class="line"><strong>-attempt_pconn</strong>: 0 or 1, default 0 Set to 1 if you want BICEPS to try making .pconn.nii files out of the generated connectivity matrices. Default = 0</div>
+<div class="line"><strong>-custom_dtvar_folder</strong>: string. If an empty string is provided (i.e. ‘’), BICEPS will produce look for dtvariance files found next to the the ptseries files. If dtvariance files are not found at this location, you can provide the path to a folder where all dtvariance files are found directly within the folder specified (i.e. NOT BIDS organized)</div>
+</div>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
