@@ -147,7 +147,7 @@ Organization requirements for running biceps_cmdln
     the file structure for a given subject and session may look like:  
 
     /study_dir/sub-01/ses-01/func/
-
+|
 2. ptseries.nii files for each subject/session.
 
   * Each session and subject that will be processed should have at least one
@@ -156,7 +156,7 @@ Organization requirements for running biceps_cmdln
     underscores, roi key, and dash will let biceps_cmdln figure out which
     parcellations are available in the input dataset. For each parcellation scheme
     biceps_cmdln will calculate a set of connectivity matrices.
-
+|
 3. Files with signal variance information.
 
   * For every concatenated run that is to be processed, the user should have a file
