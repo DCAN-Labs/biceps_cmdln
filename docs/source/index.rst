@@ -236,17 +236,17 @@ whose name varies based on the settings used to run biceps_cmdln. Underneath tha
 will be one folder for each parcellation present in the input dataset.
 
 ``` bash
-\u2514\u2500\u2500 Functional
-    \u2514\u2500\u2500 list_with_variance_MCMethod_power_2014_FD_only_FD_th_0_20_min_frames_600_skip_frames_5_TRseconds_0_80
-        \u251c\u2500\u2500 frame_removal_mask.mat
-        \u251c\u2500\u2500 Gordon2014FreeSurferSubcortical_timeseries.ptseries
-        \u2502   \u251c\u2500\u2500 fconn_600_frames.mat
-        \u2502   \u251c\u2500\u2500 fconn_820_frames.mat
-        \u2502   \u2514\u2500\u2500 fconn_all_surv_frames.mat
-        \u2514\u2500\u2500 HCP2016FreeSurferSubcortical_timeseries.ptseries
-            \u251c\u2500\u2500 fconn_600_frames.mat
-            \u251c\u2500\u2500 fconn_820_frames.mat
-            \u2514\u2500\u2500 fconn_all_surv_frames.mat
+- ── Functional
+    - ── list_with_variance_MCMethod_power_2014_FD_only_FD_th_0_20_min_frames_600_skip_frames_5_TRseconds_0_80
+        - ── frame_removal_mask.mat
+        - ── Gordon2014FreeSurferSubcortical_timeseries.ptseries
+        -    ├── fconn_600_frames.mat
+        -    ├── fconn_820_frames.mat
+        -    └── fconn_all_surv_frames.mat
+        - ── HCP2016FreeSurferSubcortical_timeseries.ptseries
+            - ── fconn_600_frames.mat
+            - ── fconn_820_frames.mat
+            - ── fconn_all_surv_frames.mat
 ```
 
 
