@@ -18,8 +18,9 @@ data that has been (1) denoised, (2) projected into a parcellated cifti space,
 (3) concatenated [in the case where multiple versions of a run type exist], (4)  
 and the data is formatted using general BIDS Derivatives principles.
 
-Using this pipeline is likely to be easiest if you are using tools generated  
-by the DCAN group at the University of Minnesota to denoise your fMRI data.  
+Using this pipeline is only recommended if you are using tools generated  
+by the DCAN group at the University of Minnesota to denoise and parcellate
+your fMRI data.  
 
 biceps_cmdln is specifically designed to calculate functional connectivity  
 matrices for a group of individuals. With this in mind, it is easiest to use  
@@ -154,7 +155,7 @@ Organization requirements for running biceps_cmdln
     pair such as "*_roi-Gordon2014FreeSurferSubcortical_*" in the name. The
     underscores, roi key, and dash will let biceps_cmdln figure out which
     parcellations are available in the input dataset. For each parcellation scheme
-    biceps_cmdln will calculate a set of connectivity matrices. 
+    biceps_cmdln will calculate a set of connectivity matrices.
 
 3. Files with signal variance information.
 
