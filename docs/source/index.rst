@@ -136,39 +136,39 @@ Organization requirements for running biceps_cmdln
 
 1. General BIDS Derivatives structure with session folders.
 
-For biceps_cmdln to be able to parse files correctly there needs
-to first be a BIDS Derivatives-like study folder. This study folder
-should contain different subject folders. Below each subject folder
-it is required for there to be session folders and then func folders
-containing denoised fMRI data. While it is generally BIDS acceptable
-for data to be organized either with or without a session structure,
-biceps_cmdln requires there to be a session structure. An example of
-the file structure for a given subject and session may look like:
+  * For biceps_cmdln to be able to parse files correctly there needs
+    to first be a BIDS Derivatives-like study folder. This study folder
+    should contain different subject folders. Below each subject folder
+    it is required for there to be session folders and then func folders
+    containing denoised fMRI data. While it is generally BIDS acceptable
+    for data to be organized either with or without a session structure,
+    biceps_cmdln requires there to be a session structure. An example of
+    the file structure for a given subject and session may look like:
 
 /study_dir/sub-01/ses-01/func/
 
 2. ptseries.nii files for each subject/session.
 
-Each session and subject that will be processed should have at least one
-file with extension "ptseries.nii". The ptseries file must have a key-value
-pair such as "*_roi-Gordon2014FreeSurferSubcortical_*" in the name. The
-underscores, roi key, and dash will let biceps_cmdln figure out which
-parcellations are available in the input dataset. For each parcellation scheme
-biceps_cmdln will calculate a set of connectivity matrices. 
+  * Each session and subject that will be processed should have at least one
+    file with extension "ptseries.nii". The ptseries file must have a key-value
+    pair such as "*_roi-Gordon2014FreeSurferSubcortical_*" in the name. The
+    underscores, roi key, and dash will let biceps_cmdln figure out which
+    parcellations are available in the input dataset. For each parcellation scheme
+    biceps_cmdln will calculate a set of connectivity matrices. 
 
 3. Files with signal variance information.
 
-For every concatenated run that is to be processed, the user should have a file
-with naming ending in "_variance.txt", where the beginning of the file name has
-the subject and session name, along with the task identifier (i.e. task-rest).
-There should be one entry at each row referring to the signal's ________. Matlab's
-isthisanoutlier function will be used to screen this file for frames that have more
-than 3 scaled median absolute deviations from the median. If the "_variance.txt" files
-can not be found within the subject/session/func folders, the user can provide a new
-folder that solely contains these files (one for each run to be processed) at the base
-level of the directory. This directory can be passed to biceps_cmdln via the custom_dtvar_folder
-argument. Note - even if the user does not want to remove outliers (i.e. if outlier flag is given
-a value of 0), these "_variance.txt" files must still be provided during processing.
+  * For every concatenated run that is to be processed, the user should have a file
+    with naming ending in "_variance.txt", where the beginning of the file name has
+    the subject and session name, along with the task identifier (i.e. task-rest).
+    There should be one entry at each row referring to the signal's ________. Matlab's
+    isthisanoutlier function will be used to screen this file for frames that have more
+    than 3 scaled median absolute deviations from the median. If the "_variance.txt" files
+    can not be found within the subject/session/func folders, the user can provide a new
+    folder that solely contains these files (one for each run to be processed) at the base
+    level of the directory. This directory can be passed to biceps_cmdln via the custom_dtvar_folder
+    argument. Note - even if the user does not want to remove outliers (i.e. if outlier flag is given
+    a value of 0), these "_variance.txt" files must still be provided during processing.
 
 Arguments
 ---------
