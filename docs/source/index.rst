@@ -135,6 +135,11 @@ Example code for base case of using file list to run biceps_cmdln: ::
 Organization requirements for running biceps_cmdln
 --------------------------------------------------
 
+It is important to remember that all of these requirements need to be satisfied
+for you to be able to use biceps_cmdln. If they are not satisfied, you may consider
+reformatting your data to meet current pipeline requirements or using a different
+pipeline to calculate connectivity matrices.
+
 1. General BIDS Derivatives structure with session folders.
 
   * For biceps_cmdln to be able to parse files correctly there needs
@@ -173,7 +178,11 @@ Organization requirements for running biceps_cmdln
 
 4. A biceps_cmdln compatible file with motion and TR information.
 
-  * 
+  * For every concatenated run that is to be processed, the user should have a file
+    with naming ending in "_mask.mat", where the beginning of the file name has
+    the subject and session name, along with the task identifier (i.e. task-rest).
+    This file should be a matlab compatible object that has information about which
+    frames are high moton and also what the TR is of the scan. 
 
 Arguments
 ---------
