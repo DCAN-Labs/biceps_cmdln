@@ -208,7 +208,7 @@ Arguments
 |
 | **-attempt_pconn**: 0 or 1, default 0 Set to 1 if you want BICEPS to try making .pconn.nii files out of the generated connectivity matrices. Default = 0  
 |
-| **-save_timeseries**: int. Set to positive value if you want to save the timeseries.  
+| **-save_timeseries**: int. Set to positive value if you want to save the timeseries. The saved timeseries will only be propogated to the outputs with standard formatting, not the BIDS formatted outputs. 
 |
 | **-fd**: float. The framewise displacement threshold in mm, default value 0.2.
 |
@@ -254,10 +254,12 @@ of this "standard" folder will look something like:
             - ── fconn_600_frames.mat
             - ── fconn_820_frames.mat
             - ── fconn_all_surv_frames.mat
+            - ── raw_timecourses.mat
         - ── HCP2016FreeSurferSubcortical_timeseries.ptseries
             - ── fconn_600_frames.mat
             - ── fconn_820_frames.mat
             - ── fconn_all_surv_frames.mat
+            - ── raw_timecourses.mat
 
 In the example above, we see how the folder below "Functional" contains infomation relevant
 to the current processing, such as the minimum frames requirement, the TR, and the FD threshold.
@@ -296,10 +298,33 @@ list described in the last paragraph.
   used to generate these matrices can be found in the <:,3>th entries. The exact name of
   this type of file will change based on your dataset. This file represents the "MinGroup"
   type of frame sampling.
+* raw_timecourses.mat: This file will only be created when the save_timeseries flag is set
+  to 1. If generated, the matlab file will have one variable named raw_tc. raw_tc will be 
+  a <n,1> cell array for n subjects that were processed. Each cell array element represents
+  a <m,p> matrix where m is the number of regions in a parcellation and p is the number of
+  frames in the scan.
 
 
 BIDS formatting
 ---------------
+
+
+- ── sub-01
+    - ──  ses-01
+        - ──  func
+            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries.json
+            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries.mat
+            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries.json
+            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries.mat
+            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-Gordon2014FreeSurferSubcortical_timeseries.json
+            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-Gordon2014FreeSurferSubcortical_timeseries.mat
+            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-HCP2016FreeSurferSubcortical_timeseries.json
+            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-HCP2016FreeSurferSubcortical_timeseries.mat
+            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries.json
+            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries.mat
+            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries.json
+            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries.mat
+
 
 
 Indices and tables
