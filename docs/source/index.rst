@@ -167,15 +167,16 @@ pipeline to calculate connectivity matrices.
   * For every concatenated run that is to be processed, the user should have a file
     with naming ending in "_variance.txt", where the beginning of the file name has
     the subject and session name, along with the task identifier (i.e. task-rest).
-    There should be one entry at each row referring to the signal's ________. Matlab's
-    isthisanoutlier function will be used to screen this file for frames that have more
-    than 3 scaled median absolute deviations from the median. If the "_variance.txt" files
-    can not be found within the subject/session/func folders, the user can provide a new
-    folder that solely contains these files (one for each run to be processed) at the base
-    level of the directory. This directory can be passed to biceps_cmdln via the custom_dtvar_folder
-    argument. Note - even if the user does not want to remove outliers (i.e. if outlier flag is given
-    a value of 0), these "_variance.txt" files must still be provided during processing.
-
+    There should be one entry at each row referring to the signal's ________. This file
+    will be screened for frames that are more than 3 scaled median absolute deviations
+    from the sample median. If the "_variance.txt" files can not be found within the
+    subject/session/func folders, the user can provide a new folder that solely contains
+    these files (one for each run to be processed) at the base level of the directory. 
+    This directory can be passed to biceps_cmdln via the custom_dtvar_folder
+    argument. Note - even if the user does not want to remove outliers (i.e. if outlier
+    flag is given a value of 0), these "_variance.txt" files must still be provided
+    during processing.
+|
 4. A biceps_cmdln compatible file with motion and TR information.
 
   * For every concatenated run that is to be processed, the user should have a file
@@ -229,11 +230,15 @@ Arguments
 Expected Outputs
 ================
 
+Standard Formatting
+-------------------
+
 biceps_cmdln will produce two output directories within the parent output directory.
 The first directory will be under the user specified output directory and named "standard".
 Under "standard" will be a folder named "Functional" and underneath that will be a folder
 whose name varies based on the settings used to run biceps_cmdln. Underneath that folder
-will be one folder for each parcellation present in the input dataset.
+will be one folder for each parcellation present in the input dataset. The overall contents
+of this "standard" folder will look something like:
 
 - ── Functional
     - ── list_with_variance_MCMethod_power_2014_FD_only_FD_th_0_20_min_frames_600_skip_frames_5_TRseconds_0_80
@@ -247,6 +252,21 @@ will be one folder for each parcellation present in the input dataset.
             - ── fconn_820_frames.mat
             - ── fconn_all_surv_frames.mat
 
+In the example above, we see how the folder below "Functional" contains infomation relevant
+to the current processing, such as the minimum frames requirement, the TR, and the FD threshold.
+
+The files seen above will have the following structure:
+* frame_removal_mask.mat: This is a matlab file with variable "mask" representing a cell array
+  with shape <n,3> where n is the number of sessions that had runs meeting the minimum
+  processing requirements, and 3 represents the different temporal masking options
+  (MaxIndividual, MaxGroup, then MinGroup, respectively). Mask values are 1 for included
+  frames and 0 for excluded frames.
+* fconn_all_surv_frames.mat: A matlab file with variable "fconn". fconn is a three dimensional
+  array with shape <m,m,n> where m is the number of regions in the parcellation and n is the
+  number of of subjects.
+
+BIDS formatting
+---------------
 
 
 Indices and tables
