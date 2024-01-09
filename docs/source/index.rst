@@ -202,8 +202,7 @@ Arguments
 |
 | **Flag Key/Value Pairs:**
 |
-| Each of the following arguments are formatted as key/value pairs where the flag should
-always be followed a value describing what action should be applied with the given flag.
+| Each of the following arguments are formatted as key/value pairs where the flag should always be followed a value describing what action should be applied with the given flag.
 |
 | **-out_dir**: string. Path to where BICEPS output should be stored. Default option is in current working directory. Remember to bind this path if using the singularity version of the tool.    
 |
