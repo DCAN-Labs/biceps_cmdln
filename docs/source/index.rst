@@ -166,25 +166,27 @@ Arguments
 |
 | **Flag Key/Value Pairs:**
 |
+| **-out_dir**: string. Path to where BICEPS output should be stored. Default option is in current working directory. Remember to bind this path if using the singularity version of the tool.    
+|
+| **-save_bids**: int. Set to a positive number if you want the output to be saved in BIDS on top of standard BICEPS output format. Default is to not save in this way.  
+|
+| **-attempt_pconn**: 0 or 1, default 0 Set to 1 if you want BICEPS to try making .pconn.nii files out of the generated connectivity matrices. Default = 0  
+|
+| **-save_timeseries**: int. Set to positive value if you want to save the timeseries.  
+|
 | **-fd**: float. The framewise displacement threshold in mm, default value 0.2.
+|
+| **-n_skip_vols**: int. The number of frames to skip at the beginning of every scan. Default is 5. Remember - if you are working with concatenated runs, this will only remove frames from the first run in the concatenated series.   
 |
 | **-minutes**: float. The minimum amount of data a subject must have to be included in processing, measured in minutes. Default value = 8 min. To convert frames to time, the tool will extract TR from input metadata (file ending in "_mast.mat").
 |
 | **-outlier**: 1 or 0. Whether to remove outliers based on signal variability, default 1.  
 |
-| **-out_dir**: string. Path to where BICEPS output should be stored. Default option is in current working directory. Remember to bind this path if using the singularity version of the tool.    
-|
-| **-save_bids**: int. Set to a positive number if you want the output to be saved in BIDS on top of standard BICEPS output format. Default is to not save in this way.  
-|
 | **-validate_frame_counts**: int. Set to a positive number if you want to validate that all runs have the same number of frames.  
-|
-| **-n_skip_vols**: int. The number of frames to skip at the beginning of every scan. Default is 5. Remember - if you are working with concatenated runs, this will only remove frames from the first run in the concatenated series.   
-|
-| **-save_timeseries**: int. Set to positive value if you want to save the timeseries.  
 |
 | **-wb_command_path**: string. Set the path to wb_command from HCP. By default BICEPS will try to find this path on its own.  
 |
-| **-make_dense_conns**: int. Set to positive number to make dconn files from dtseries.  
+| **-make_dense_conns**: int. Set to positive number to make dconn files from dtseries. Note - you must have corresponding ptseries files for this to work. The output dconn files will have the same temporal masking as the pconn files.   
 |
 | **-dtseries_smoothing**: float. The amount of smoothing to use, for both surface and volume space, in millimeters (sigma of gaussian kernel). This only is used if -make_dense_conns flag is activated.  
 |
@@ -192,10 +194,8 @@ Arguments
 |
 | **-right_hem_surface**: string. The path to the right hemisphere to use for smoothing. See description from left_hem_surface for more info.  
 |
-| **-attempt_pconn**: 0 or 1, default 0 Set to 1 if you want BICEPS to try making .pconn.nii files out of the generated connectivity matrices. Default = 0  
+| **-custom_dtvar_folder**: string. If flag is used BICEPS will accept the path to a folder where all dtvariance files are found directly within the folder specified (i.e. NOT BIDS organized)  
 |
-| **-custom_dtvar_folder**: string. If an empty string is provided (i.e. ''), BICEPS will produce look for dtvariance files found next to the the ptseries files. If dtvariance files are not found at this location, you can provide the path to a folder where all dtvariance files are found directly within the folder specified (i.e. NOT BIDS organized)  
-
 
 Indices and tables
 ==================
