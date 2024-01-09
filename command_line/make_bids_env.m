@@ -163,6 +163,7 @@ for i=1:n_parcel
 
             %Save conn mat for minimum number of volumes
             temp_name = strrep(generic_name, '_bold', '_frames-MaxIndividual_bold');
+            temp_name = strrep(temp_name, '.mat', '_desc-conn.mat');
             output_path = fullfile(output_folder, temp_name);
             ind_fconn = squeeze(fconn(:,:,j));
             save(output_path, 'ind_fconn');
@@ -212,6 +213,7 @@ for i=1:n_parcel
             %Save conn mat for maximum number of volumes (same across
             %subjects)
             temp_name = strrep(generic_name, '_bold', '_frames-MaxGroup_bold');
+            temp_name = strrep(temp_name, '.mat', '_desc-conn.mat');
             output_folder = fullfile(handles.env.path_gagui, 'bids', handles.participants.ids{ix(j)}, handles.participants.visit_folder{ix(j)}, 'func');
             output_path = fullfile(output_folder, temp_name);
             ind_fconn = squeeze(fconn(:,:,j));
@@ -263,6 +265,7 @@ for i=1:n_parcel
             %Save conn mat for maximum number of volumes (different across
             %subjects)
             temp_name = strrep(generic_name, '_bold', '_frames-MinGroup_bold');
+            temp_name = strrep(temp_name, '.mat', '_desc-conn.mat');
             output_folder = fullfile(handles.env.path_gagui, 'bids', handles.participants.ids{ix(j)}, handles.participants.visit_folder{ix(j)}, 'func');
             output_path = fullfile(output_folder, temp_name);
             ind_fconn = squeeze(fconn(:,:,j));
