@@ -61,14 +61,21 @@ legacy application of biceps_cmdln's parent tool "BICEPS". Full documentation
 of the BICEPS GUI can be seen `here <https://gui-environments-documentation.readthedocs.io/en/latest/GUI_environments/>`_.
 Because singularity containers are only able to look at paths that are specified by the user
 at the time the container is ran, it is still necessary to "bind" the input and output directories
-where any data is stored prior to running biceps_cmdln: ::
+where any data is stored prior to running biceps_cmdln. Also be sure to bind the directory
+containing the file list that will be grabbed to run processing. Binding the directory with
+the file list is required both so that desired file list can be read, and because by default
+the GUI application will save the list of subjects that met processing requirements to the
+same directory where the file list was taken from (note, this is not necessary for command
+line driven processing): ::
 
     $ input_denoised_dir=/path/to/fmri/processing_output/
     $ biceps_output_dir=/path/to/directory/for/biceps/output/
+    $ folder_with_file_list=/path/to/folder/containing/file/list/
     $ container_path=/path/to/biceps/singularity/container.sif
     $ singularity run \
         -B $input_denoised_dir:/input \
         -B $biceps_output_dir:/output \
+        -B $folder_with_file_list:/file_list_dir \
         $container_path
 
 Running biceps_cmdln using an input folder with processed fmri data
@@ -255,7 +262,22 @@ of this "standard" folder will look something like:
 In the example above, we see how the folder below "Functional" contains infomation relevant
 to the current processing, such as the minimum frames requirement, the TR, and the FD threshold.
 
-The files seen above will have the following structure:
+In addition to these files there will be file list of subjects that were included in processing. This
+file will generally be directly under the output directory (meaning adjacent to "standard"), and have
+one line for each subject that was included in processing. Additionally if the user provided biceps_cmdln
+with a folder to process instead of a file list, there will be a file named "biceps_file_list.txt" that
+displays all the subjects/sessions that were candidates for processing. The difference between the two
+file lists is that the first list excludes subjects that didn't have the prerequisite number of frames
+for processing. The exception to this file layout is if the GUI form of biceps_cmdln was used to initiate
+processing. In the case the GUI is used, the copy of the list describing which files were used in
+processing will instead be found in the same directory as the file list that was selected by the
+GUI at the beginning of processing.
+
+The files outlined in the chart above will have the following structure. For all instances
+where there are "n" dimensions representing some number of subjects/sessions that were included
+in processing, the ordering of those n subjects will be the same as listed in the output file
+list described in the last paragraph.
+|
 * frame_removal_mask.mat: This is a matlab file with variable "mask" representing a cell array
   with shape <n,3> where n is the number of sessions that had runs meeting the minimum
   processing requirements, and 3 represents the different temporal masking options
@@ -263,7 +285,18 @@ The files seen above will have the following structure:
   frames and 0 for excluded frames.
 * fconn_all_surv_frames.mat: A matlab file with variable "fconn". fconn is a three dimensional
   array with shape <m,m,n> where m is the number of regions in the parcellation and n is the
-  number of of subjects.
+  number of of subjects. The frames used to create these connectivity matrices is found in
+  the <:,1>th entries of the frame_removal_mask file. There will be one of these files generated
+  for each parcellation that was used during processing.
+* fconn_820_frames.mat: Same structure as fconn_all_surv_frames.mat. Now the mask entries
+  used to generate these matrices can be found in the <:,2>th entries. The exact name of
+  this type of file will change based on your dataset. This file represents the "MaxGroup"
+  type of frame sampling.
+* fconn_600_frames.mat: Same structure as fconn_all_surv_frames.mat. Now the mask entries
+  used to generate these matrices can be found in the <:,3>th entries. The exact name of
+  this type of file will change based on your dataset. This file represents the "MinGroup"
+  type of frame sampling.
+
 
 BIDS formatting
 ---------------
