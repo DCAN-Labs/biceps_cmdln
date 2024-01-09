@@ -11,7 +11,7 @@ Welcome to biceps_cmdln's documentation!
    :caption: Contents:
 
 What is biceps_cmdln?  
----------------------
+=====================
 biceps_cmdln is a tool for calculating functional connectivity matrices.  
 The tool is specifically designed for individuals who already have fMRI  
 data that has been (1) denoised, (2) projected into a parcellated cifti space,  
@@ -52,6 +52,8 @@ be applied to the .dtseries.nii file. See "Calculating Dense Connectivity Matric
 details.
 
 
+Ways of running biceps_cmdln
+============================
 
 Starting biceps_cmdln as GUI application
 ----------------------------------------
@@ -140,7 +142,7 @@ Example code for base case of using file list to run biceps_cmdln: ::
 
 
 Organization requirements for running biceps_cmdln
---------------------------------------------------
+==================================================
 
 It is important to remember that all of these requirements need to be satisfied
 for you to be able to use biceps_cmdln. If they are not satisfied, you may consider
@@ -159,7 +161,7 @@ pipeline to calculate connectivity matrices.
     the file structure for a given subject and session may look like:  
 
     /study_dir/sub-01/ses-01/func/
-|
+
 2. ptseries.nii files for each subject/session.
 
   * Each session and subject that will be processed should have at least one
@@ -168,7 +170,7 @@ pipeline to calculate connectivity matrices.
     underscores, roi key, and dash will let biceps_cmdln figure out which
     parcellations are available in the input dataset. For each parcellation scheme
     biceps_cmdln will calculate a set of connectivity matrices.
-|
+
 3. Files with signal variance information.
 
   * For every concatenated run that is to be processed, the user should have a file
@@ -183,7 +185,7 @@ pipeline to calculate connectivity matrices.
     argument. Note - even if the user does not want to remove outliers (i.e. if outlier
     flag is given a value of 0), these "_variance.txt" files must still be provided
     during processing.
-|
+
 4. A biceps_cmdln compatible file with motion and TR information.
 
   * For every concatenated run that is to be processed, the user should have a file
@@ -193,7 +195,7 @@ pipeline to calculate connectivity matrices.
     frames are high moton and also what the TR is of the scan. 
 
 Arguments
----------
+=========
 
 | **Positional:**
 |
@@ -202,8 +204,7 @@ Arguments
 |
 | **Flag Key/Value Pairs:**
 |
-Each of the following arguments are formatted as key/value pairs where the flag should
-always be followed a value describing what action should be applied with the given flag.
+| Each of the following arguments are formatted as key/value pairs where the flag should always be followed a value describing what action should be applied with the given flag.
 |
 | **-out_dir**: string. Path to where BICEPS output should be stored. Default option is in current working directory. Remember to bind this path if using the singularity version of the tool.    
 |
@@ -342,14 +343,3 @@ the scan.
             - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.mat
             - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.json
             - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.mat
-
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
