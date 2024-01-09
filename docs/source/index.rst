@@ -235,7 +235,6 @@ Under "standard" will be a folder named "Functional" and underneath that will be
 whose name varies based on the settings used to run biceps_cmdln. Underneath that folder
 will be one folder for each parcellation present in the input dataset.
 
-``` bash
 - ── Functional
     - ── list_with_variance_MCMethod_power_2014_FD_only_FD_th_0_20_min_frames_600_skip_frames_5_TRseconds_0_80
         - ── frame_removal_mask.mat
@@ -247,7 +246,6 @@ will be one folder for each parcellation present in the input dataset.
             - ── fconn_600_frames.mat
             - ── fconn_820_frames.mat
             - ── fconn_all_surv_frames.mat
-```
 
 
 
