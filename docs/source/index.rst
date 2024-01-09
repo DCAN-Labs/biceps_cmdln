@@ -312,18 +312,18 @@ BIDS formatting
 - ── sub-01
     - ──  ses-01
         - ──  func
-            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries.json
-            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries.mat
-            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries.json
-            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries.mat
-            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-Gordon2014FreeSurferSubcortical_timeseries.json
-            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-Gordon2014FreeSurferSubcortical_timeseries.mat
-            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-HCP2016FreeSurferSubcortical_timeseries.json
-            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-HCP2016FreeSurferSubcortical_timeseries.mat
-            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries.json
-            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries.mat
-            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries.json
-            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries.mat
+            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.json
+            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.mat
+            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.json
+            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.mat
+            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.json
+            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.mat
+            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.json
+            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.mat
+            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.json
+            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.mat
+            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.json
+            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.mat
 
 
 
