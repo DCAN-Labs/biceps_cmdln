@@ -48,7 +48,7 @@ RUN wget https://s3.msi.umn.edu/leex6144-public/v912.zip -O /mcr_path/mcr.zip \
 
 #Download the unique code for this project
 RUN mkdir /code
-RUN wget https://s3.msi.umn.edu/leex6144-public/biceps_cmdln_compiled_v1_0.zip -O /code/code.zip \
+RUN wget https://s3.msi.umn.edu/leex6144-public/biceps_cmdln_compiled_v1_2.zip -O /code/code.zip \
     && cd /code \
     && unzip -q ./code.zip \
     && rm /code/code.zip
@@ -64,4 +64,4 @@ RUN chmod 555 -R /mcr_path /code
 ENV PATH="${PATH}:/code"
 
 #Define entrypoint
-ENTRYPOINT ["/code/run_biceps_cmdln.sh $MCR_PATH"]
+ENTRYPOINT ["/code/run_biceps_cmdln.sh", "$MCR_PATH"]
