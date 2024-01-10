@@ -1,4 +1,4 @@
-function tseries = read_cifti_via_csv (path_cifti,path_wb_c)
+function tseries = read_cifti_via_csv (path_cifti,path_wb_c, varargin)
 
 %% tseries = read_cifti_via_csv (path_cifti,path_wb_c)
 % This function reads ciftis by making a csv first and then importing the
@@ -18,6 +18,9 @@ ix=1:numel(ascii_char_map);
 rand_ix=randi(numel(ix),N_random_char,1);
 rand_part=char(ascii_char_map(rand_ix));
 temp_csv=['who_cares_' rand_part '.csv'];
+if nargin == 3
+    temp_csv = fullfile(varargin{1}, temp_csv);
+end
 %% Create the text to run in the system
 
 if ~isfile(path_cifti)

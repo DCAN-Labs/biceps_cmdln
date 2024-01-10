@@ -88,7 +88,8 @@ for i=1:n_parcel
         local_filename=strtrim(ls([path_to_nii fs filename]));
     end
     
-    TEMP_RAW = read_cifti_via_csv (local_filename,quotes_if_space(handles.paths.wb_command));
+    [group_folder,~,~] = fileparts(handles.groupFile);
+    TEMP_RAW = read_cifti_via_csv (local_filename,quotes_if_space(handles.paths.wb_command), group_folder);
     
     temp_raw_masked=TEMP_RAW(:,mask{j,1});% mask raw timecourses
     if handles.save_raw_timecourses_flag

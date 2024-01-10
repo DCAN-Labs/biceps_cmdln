@@ -195,7 +195,7 @@ else
     end
 
     %workbench command path
-    wb_command_path = grab_from_input(keys, values, '-wb_command_path', '/home/faird/shared/code/external/utilities/workbench/1.4.2/workbench/bin_rh_linux64/wb_command');
+    wb_command_path = grab_from_input(keys, values, '-wb_command_path', '/wb_code/workbench/bin_linux64/wb_command');
     handles.cmdln.wb_command_path = wb_command_path;
     
     handles = setfield(handles, 'paths', 'wb_command', wb_command_path);

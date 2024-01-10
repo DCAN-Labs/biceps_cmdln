@@ -88,6 +88,7 @@ for i=1:n_parcel
         local_filename=strtrim(ls([path_to_nii fs filename]));
     end
     
+    group_folder = 
     TEMP_RAW = read_cifti_via_csv (local_filename,quotes_if_space(handles.paths.wb_command));
     
     temp_raw_masked=TEMP_RAW(:,mask{j,1});% mask raw timecourses
@@ -163,6 +164,7 @@ for i=1:n_parcel
 
             %Save conn mat for minimum number of volumes
             temp_name = strrep(generic_name, '_bold', '_frames-MaxIndividual_bold');
+            temp_name = strrep(temp_name, '.mat', '_desc-conn.mat');
             output_path = fullfile(output_folder, temp_name);
             ind_fconn = squeeze(fconn(:,:,j));
             save(output_path, 'ind_fconn');
@@ -188,8 +190,9 @@ for i=1:n_parcel
                     out_pconn = [output_path(1:end-3) 'pconn.nii'];
                     mat2cifti(ind_fconn, out_pconn);
                 catch
-                    disp(['Unable to find candidate pconn template for '
-            
+                    disp(['Unable to find candidate pconn template for conn. output: ' output_path]);
+                end
+            end
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         end
     end
@@ -211,6 +214,7 @@ for i=1:n_parcel
             %Save conn mat for maximum number of volumes (same across
             %subjects)
             temp_name = strrep(generic_name, '_bold', '_frames-MaxGroup_bold');
+            temp_name = strrep(temp_name, '.mat', '_desc-conn.mat');
             output_folder = fullfile(handles.env.path_gagui, 'bids', handles.participants.ids{ix(j)}, handles.participants.visit_folder{ix(j)}, 'func');
             output_path = fullfile(output_folder, temp_name);
             ind_fconn = squeeze(fconn(:,:,j));
@@ -220,9 +224,9 @@ for i=1:n_parcel
             clear conn_mat_struct;
             conn_mat_struct.subject = handles.participants.ids{ix(j)};
             conn_mat_struct.session = handles.participants.visit_folder{ix(j)};
-            conn_mat_struct.good_frames_inds = int8(mask{j,1});
-            conn_mat_struct.num_included_frames = sum(mask{j,1});
-            conn_mat_struct.num_excluded_frames = length(mask{j,1}) - sum(mask{j,1});
+            conn_mat_struct.good_frames_inds = int8(mask{j,2});
+            conn_mat_struct.num_included_frames = sum(mask{j,2});
+            conn_mat_struct.num_excluded_frames = length(mask{j,2}) - sum(mask{j,2});
             clear full_struct;
             full_struct.conn_mat_struct = conn_mat_struct;
             full_struct.standard_struct = standard_struct;
@@ -231,6 +235,15 @@ for i=1:n_parcel
             fid = fopen(json_path,'w'); 
             fprintf(fid,'%s',json_content);
             fclose(fid);
+            
+            if handles.cmdln.attempt_pconn > 0
+                try
+                    out_pconn = [output_path(1:end-3) 'pconn.nii'];
+                    mat2cifti(ind_fconn, out_pconn);
+                catch
+                    disp(['Unable to find candidate pconn template for conn. output: ' output_path]);
+                end
+            end
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         end
     end
@@ -253,6 +266,7 @@ for i=1:n_parcel
             %Save conn mat for maximum number of volumes (different across
             %subjects)
             temp_name = strrep(generic_name, '_bold', '_frames-MinGroup_bold');
+            temp_name = strrep(temp_name, '.mat', '_desc-conn.mat');
             output_folder = fullfile(handles.env.path_gagui, 'bids', handles.participants.ids{ix(j)}, handles.participants.visit_folder{ix(j)}, 'func');
             output_path = fullfile(output_folder, temp_name);
             ind_fconn = squeeze(fconn(:,:,j));
@@ -262,9 +276,9 @@ for i=1:n_parcel
             clear conn_mat_struct;
             conn_mat_struct.subject = handles.participants.ids{ix(j)};
             conn_mat_struct.session = handles.participants.visit_folder{ix(j)};
-            conn_mat_struct.good_frames_inds = int8(mask{j,1});
-            conn_mat_struct.num_included_frames = sum(mask{j,1});
-            conn_mat_struct.num_excluded_frames = length(mask{j,1}) - sum(mask{j,1});
+            conn_mat_struct.good_frames_inds = int8(mask{j,3});
+            conn_mat_struct.num_included_frames = sum(mask{j,3});
+            conn_mat_struct.num_excluded_frames = length(mask{j,3}) - sum(mask{j,3});
             clear full_struct;
             full_struct.conn_mat_struct = conn_mat_struct;
             full_struct.standard_struct = standard_struct;
@@ -273,6 +287,15 @@ for i=1:n_parcel
             fid = fopen(json_path,'w'); 
             fprintf(fid,'%s',json_content);
             fclose(fid);
+            
+            if handles.cmdln.attempt_pconn > 0
+                try
+                    out_pconn = [output_path(1:end-3) 'pconn.nii'];
+                    mat2cifti(ind_fconn, out_pconn);
+                catch
+                    disp(['Unable to find candidate pconn template for conn. output: ' output_path]);
+                end
+            end
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         end
     end
@@ -318,7 +341,6 @@ if isfield(handles, 'calc_dense_conns') > 0
         mask_descriptions = {'frames-MaxIndividual', 'frames-MaxGroup', 'frames-MinGroup'};
         make_dense_conns(input_folder, input_filename, output_folder, subject_masks, mask_descriptions, ...
                          handles.dtseries_smoothing_kernel, handles.left_hem_for_smoothing, handles.right_hem_for_smoothing, handles.paths.wb_command)
-        %make_dense_conns(input_folder, input_filename, output_folder, subject_masks, mask_descriptions, handles.paths.wb_command);
 
     end
 end

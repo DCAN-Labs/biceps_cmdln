@@ -94,12 +94,13 @@ for k=1:n
         frame_count(:)=sum(this_guy_frames_per_rest);
     else
         disp(['Validating frames and parcellations for survivor ' num2str(k) ' out of ' num2str(n)])
+        [group_folder,~,~] = fileparts(handles.groupFile);
         parcels_per_study(k)=n_nii;
         for j = 1:n_nii
             [pathstr,name,ext] = fileparts(nii_files{j});
             temp{j}=name;
             nii_files{j};
-            c = read_cifti_via_csv (nii_files{j},quotes_if_space(handles.paths.wb_command));
+            c = read_cifti_via_csv (nii_files{j},quotes_if_space(handles.paths.wb_command), group_folder);
             [num_parcels,frame_count(j)]=size(c);
         end
     end
