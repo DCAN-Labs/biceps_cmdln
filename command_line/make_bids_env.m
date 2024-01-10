@@ -118,7 +118,7 @@ for i=1:n_parcel
             full_filenames_first_parc{j} = local_filename;
         end
         
-        TEMP_RAW=read_cifti_via_csv(local_filename,quotes_if_space(handles.paths.wb_command));
+        TEMP_RAW=read_cifti_via_csv(local_filename,quotes_if_space(handles.paths.wb_command), group_folder);
         raw_tc{j}=TEMP_RAW;
 
         [~, b, ~] = fileparts(local_filename);
