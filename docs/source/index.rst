@@ -12,13 +12,14 @@ Welcome to biceps_cmdln's documentation!
 
 What is biceps_cmdln?  
 =====================
-biceps_cmdln is a tool for calculating functional connectivity matrices.  
+biceps_cmdln is a tool for calculating functional connectivity matrices from parcellated timeseries data.  
 The tool is specifically designed for individuals who already have fMRI  
 data that has been (1) denoised, (2) projected into a parcellated cifti space,  
-(3) concatenated [in the case where multiple versions of a run type exist], (4)  
-and the data is formatted using general BIDS Derivatives principles.
+(3) concatenated [in the case where multiple versions of a run type exist], and (4)  
+formatted using general BIDS Derivatives principles.
 
-Using this pipeline is only recommended if you are using tools generated  
+Further, because this tool makes use of certain assumptions about the formatting of
+input data - using this pipeline is only recommended if you are using tools developed  
 by the DCAN group at the University of Minnesota to denoise and parcellate
 your fMRI data.  
 
@@ -51,6 +52,48 @@ frames will be included/excluded for calculating connectivity matrices from .pts
 be applied to the .dtseries.nii file. See "Calculating Dense Connectivity Matrices" section for more
 details.
 
+Downloading biceps_cmdln
+========================
+
+Singularity Container
+---------------------
+
+It is recommended that users run biceps_cmdln as a singularity image.
+This means that the user must have singularity installed on their system.
+Using a singularity image ensures that the user doesn't have to have Matlab or HCP Connectome Workbench
+tools installed on their system. To download the container, go to the
+`DCAN Labs docker hub page <https://hub.docker.com/u/dcanumn>`_ and download the
+most recent version of biceps_cmdln. When building the image on your local machine,
+ensure that you have 100gb of /tmp space before initiating the build process. If
+you are building biceps_cmdln within a SLURM job at UMN, you can use the following code
+to request appropriate resources: ::
+
+    $ srun -N 1 --ntasks-per-node=1  --tmp=100g --mem-per-cpu=30g -t 5:00:00 -p interactive --pty bash
+
+Then to build the image run: ::
+
+   $ singularity pull docker://dcanumn/biceps_cmdln:1.3
+
+The previous command may take up to 3 hours to run and will result in a new .sif file being created
+in your current working directory.
+
+
+Github
+------
+
+Alternatively, it is possible to clone the
+`github repository for biceps_cmdln <https://github.com/DCAN-Labs/biceps_cmdln>`_. If you choose to
+interact with biceps_cmdln in this way, you will want to have matlab and the HCP Conectome Workbench
+tools first installed on your system. After you start up Matlab go to the biceps_cmdln folder and add
+all files (recursively) to the matlab path. Then you should be able to type "biceps_cmdln" and to run
+the application in a similar fashion to what is described in the following sections, using the same flags. Importantly, biceps_cmdln
+assumes that the path to HCP Connectome Workbench tools are at a specific path within the container and this
+path will no longer be correct. So when running biceps_cmdln you will either want to edit the default wb_command path
+within the biceps_cmdln function or use the "wb_command_path" flag to provide a new path to wb_command whenever
+running the application. Also if you want to use biceps_cmdln in the GUI mode, then you will need to edit the
+field handles.paths.wb_command within the settings_make_par_env.m script. It is not recommended that you
+run biceps_cmdln directly in Matlab. Rather it is recommended that you only use the singularity code to run biceps_cmdln.
+
 
 Ways of running biceps_cmdln
 ============================
@@ -74,7 +117,7 @@ line driven processing): ::
     $ biceps_output_dir=/path/to/directory/for/biceps/output/
     $ folder_with_file_list=/path/to/folder/containing/file/list/
     $ container_path=/path/to/biceps/singularity/container.sif
-    $ singularity run \
+    $ singularity run --cleanenv \
         -B $input_denoised_dir:/input \
         -B $biceps_output_dir:/output \
         -B $folder_with_file_list:/file_list_dir \
@@ -93,7 +136,7 @@ assumptions. The code to run this is as follows: ::
     $ input_denoised_dir=/path/to/fmri/processing_output/
     $ biceps_output_dir=/path/to/directory/for/biceps/output/
     $ container_path=/path/to/biceps/singularity/container.sif
-    $ singularity run \
+    $ singularity run --cleanenv \
         -B $input_denoised_dir:/input \
         -B $biceps_output_dir:/output \
         $container_path /input \
@@ -106,7 +149,7 @@ Running biceps_cmdln using an input file list pointing to sessions
 If you have a directory with processed fMRI data and you want to
 exclude one or more subjects or sessions from biceps_cmdln processing,
 then you may want to run biceps_cmdln by passing the tool a file list
-instead of a folder. This file list should be a plain text file having 
+instead of a derivative folder. This file list should be a plain text file having 
 one entry per line, where each line points to a session directory that 
 should be included in biceps_cmdln attempts to calculate functional 
 connectivity matrices. 
@@ -132,7 +175,7 @@ Example code for base case of using file list to run biceps_cmdln: ::
     $ biceps_output_dir=/path/to/directory/for/biceps/output/
     $ file_list=/path/to/file_list.txt
     $ container_path=/path/to/biceps/singularity/container.sif
-    $ singularity run \
+    $ singularity run --cleanenv \
         -B $input_denoised_dir:/input \
         -B $biceps_output_dir:/output \
         -B $file_list:/file/list.txt \
