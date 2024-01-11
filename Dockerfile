@@ -24,8 +24,17 @@ RUN apt-get update && \
                     libxi-dev \
                     libxmu-dev \
                     libglu1-mesa-dev \
-                    pip && \
+                    pip \
+                    libx11-6 \
+                    libxext6 \
+                    libxrender-dev \
+                    openjdk-8-jdk \
+                     && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/
+
+#                    python3.9 \
+#                    python3.9-distutils \
+#                    python3.9-dev\
 
 #Download hcp workbench software and add it to the local path
 RUN mkdir /wb_code
@@ -48,14 +57,14 @@ RUN wget https://s3.msi.umn.edu/leex6144-public/v912.zip -O /mcr_path/mcr.zip \
 
 #Download the unique code for this project
 RUN mkdir /code
-RUN wget https://s3.msi.umn.edu/leex6144-public/biceps_cmdln_compiled_v1_2.zip -O /code/code.zip \
+RUN wget https://s3.msi.umn.edu/leex6144-public/biceps_cmdln_compiled_v1_3.zip -O /code/code.zip \
     && cd /code \
     && unzip -q ./code.zip \
     && rm /code/code.zip
 
 #Export paths (make sure LD_LIBRARY_PATH is set to the correct version)
 ENV MCR_PATH=/mcr_path/v912
-ENV LD_LIBRARY_PATH ="${LD_LIBRARY_PATH}:/mcr_path/v912/runtime/glnxa64:/mcr_path/v912/bin/glnxa64:/mcr_path/v912/sys/os/glnxa64:/mcr_path/v912/extern/bin/glnxa64"
+ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/mcr_path/v912/runtime/glnxa64:/mcr_path/v912/bin/glnxa64:/mcr_path/v912/sys/os/glnxa64:/mcr_path/v912/extern/bin/glnxa64"
 
 #Set permissions
 RUN chmod 555 -R /mcr_path /code
@@ -64,4 +73,4 @@ RUN chmod 555 -R /mcr_path /code
 ENV PATH="${PATH}:/code"
 
 #Define entrypoint
-ENTRYPOINT ["/bin/bash", "/code/run_biceps_cmdln.sh", "$MCR_PATH"]
+ENTRYPOINT ["/bin/bash", "/code/run_biceps_cmdln.sh", "$LD_LIBRARY_PATH"]

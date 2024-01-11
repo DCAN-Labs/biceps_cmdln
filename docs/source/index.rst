@@ -90,8 +90,9 @@ the application in a similar fashion to what is described in the following secti
 assumes that the path to HCP Connectome Workbench tools are at a specific path within the container and this
 path will no longer be correct. So when running biceps_cmdln you will either want to edit the default wb_command path
 within the biceps_cmdln function or use the "wb_command_path" flag to provide a new path to wb_command whenever
-running the application. It is not recommended that you run biceps_cmdln directly in Matlab. Rather it is recommended
-that you only use the singularity code to run biceps_cmdln.
+running the application. Also if you want to use biceps_cmdln in the GUI mode, then you will need to edit the
+field handles.paths.wb_command within the settings_make_par_env.m script. It is not recommended that you
+run biceps_cmdln directly in Matlab. Rather it is recommended that you only use the singularity code to run biceps_cmdln.
 
 
 Ways of running biceps_cmdln
