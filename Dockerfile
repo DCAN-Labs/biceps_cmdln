@@ -73,4 +73,4 @@ RUN chmod 555 -R /mcr_path /code
 ENV PATH="${PATH}:/code"
 
 #Define entrypoint
-ENTRYPOINT ["/bin/bash", "/code/run_biceps_cmdln.sh", "$LD_LIBRARY_PATH"]
+ENTRYPOINT ["LD_LIBRARY_PATH=/mcr_path/v912/runtime/glnxa64:/mcr_path/v912/bin/glnxa64:/mcr_path/v912/sys/os/glnxa64:/mcr_path/v912/extern/bin/glnxa64:/.singularity.d/libs", "&&", "/bin/bash", "/code/run_biceps_cmdln.sh", "$LD_LIBRARY_PATH"]
