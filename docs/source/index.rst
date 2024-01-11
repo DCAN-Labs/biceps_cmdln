@@ -12,13 +12,14 @@ Welcome to biceps_cmdln's documentation!
 
 What is biceps_cmdln?  
 =====================
-biceps_cmdln is a tool for calculating functional connectivity matrices.  
+biceps_cmdln is a tool for calculating functional connectivity matrices from parcellated timeseries data.  
 The tool is specifically designed for individuals who already have fMRI  
 data that has been (1) denoised, (2) projected into a parcellated cifti space,  
-(3) concatenated [in the case where multiple versions of a run type exist], (4)  
-and the data is formatted using general BIDS Derivatives principles.
+(3) concatenated [in the case where multiple versions of a run type exist], and (4)  
+formatted using general BIDS Derivatives principles.
 
-Using this pipeline is only recommended if you are using tools generated  
+Further, because this tool makes use of certain assumptions about the formatting of
+input data - using this pipeline is only recommended if you are using tools developed  
 by the DCAN group at the University of Minnesota to denoise and parcellate
 your fMRI data.  
 
@@ -58,8 +59,8 @@ Singularity Container
 ---------------------
 
 It is recommended that users run biceps_cmdln as a singularity image.
-This means that the user must have singularity installed on their system,
-but ensures that the user doesn't have to have Matlab or HCP Connectome Workbench
+This means that the user must have singularity installed on their system.
+Using a singularity image ensures that the user doesn't have to have Matlab or HCP Connectome Workbench
 tools installed on their system. To download the container, go to the
 `DCAN Labs docker hub page <https://hub.docker.com/u/dcanumn>`_ and download the
 most recent version of biceps_cmdln. When building the image on your local machine,
@@ -147,7 +148,7 @@ Running biceps_cmdln using an input file list pointing to sessions
 If you have a directory with processed fMRI data and you want to
 exclude one or more subjects or sessions from biceps_cmdln processing,
 then you may want to run biceps_cmdln by passing the tool a file list
-instead of a folder. This file list should be a plain text file having 
+instead of a derivative folder. This file list should be a plain text file having 
 one entry per line, where each line points to a session directory that 
 should be included in biceps_cmdln attempts to calculate functional 
 connectivity matrices. 
