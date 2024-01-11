@@ -64,4 +64,4 @@ RUN chmod 555 -R /mcr_path /code
 ENV PATH="${PATH}:/code"
 
 #Define entrypoint
-ENTRYPOINT ["/code/run_biceps_cmdln.sh", "$MCR_PATH"]
+ENTRYPOINT ["/bin/bash", "/code/run_biceps_cmdln.sh", "$MCR_PATH"]
