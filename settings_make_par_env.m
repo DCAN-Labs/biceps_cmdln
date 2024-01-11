@@ -23,7 +23,7 @@ handles.env.masked_tc='masked_timecourses.mat';
 %% Places where this GUI looks for paths and files, by default
 handles.paths.wd=pwd; %working directory
 handles.paths.group_file=[handles.paths.wd '/group_lists'];
-handles.paths.wb_command='/home/exacloud/lustre1/fnl_lab/code/external/utilities/workbench-1.2.3-HCP/bin_rh_linux64/wb_command';
+handles.paths.wb_command='/wb_code/workbench/bin_linux64/wb_command';
 %handles.paths.append_path_csv_parcellations=['FNL_preproc_v2' fs 'analyses_v2' fs 'timecourses'];% subfolders after pipeline to find csv parcellations
 %handles.paths.append_path_motion_numbers=['FNL_preproc_v2' fs 'analyses_v2' fs 'motion'];% subfolders after pipeline to find motion mumbers
 %handles.paths.matlab_code_with_EPI=['FNL_preproc_v2' fs 'analyses_v2' fs 'matlab_code' fs 'FNL_preproc_analysis_v2.m'];% subfolders after pipeline to find motion mumbers

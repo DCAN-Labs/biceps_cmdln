@@ -13,7 +13,7 @@ catch
 end
 
 if local_wb_command_exist == 0
-    wb_command_on_msi = '/home/faird/shared/code/external/utilities/workbench/1.4.2/workbench/bin_rh_linux64/wb_command';
+    wb_command_on_msi = '/wb_code/workbench/bin_linux64/wb_command';
     
     if isfile(wb_command_on_msi) == 1
         handles.paths.wb_command= wb_command_on_msi;
