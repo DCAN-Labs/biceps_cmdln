@@ -63,7 +63,6 @@ RUN wget https://s3.msi.umn.edu/leex6144-public/biceps_cmdln_compiled_v1_3.zip -
     && rm /code/code.zip
 
 #Export paths (make sure LD_LIBRARY_PATH is set to the correct version)
-ENV MCR_PATH=/mcr_path/v912
 ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/mcr_path/v912/runtime/glnxa64:/mcr_path/v912/bin/glnxa64:/mcr_path/v912/sys/os/glnxa64:/mcr_path/v912/extern/bin/glnxa64"
 
 #Set permissions
@@ -73,4 +72,4 @@ RUN chmod 555 -R /mcr_path /code
 ENV PATH="${PATH}:/code"
 
 #Define entrypoint
-ENTRYPOINT ["LD_LIBRARY_PATH=/mcr_path/v912/runtime/glnxa64:/mcr_path/v912/bin/glnxa64:/mcr_path/v912/sys/os/glnxa64:/mcr_path/v912/extern/bin/glnxa64:/.singularity.d/libs", "&&", "/bin/bash", "/code/run_biceps_cmdln.sh", "$LD_LIBRARY_PATH"]
+ENTRYPOINT ["/bin/bash", "/code/run_biceps_cmdln.sh", "/mcr_path/v912"]
