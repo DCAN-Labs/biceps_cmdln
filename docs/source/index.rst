@@ -72,7 +72,7 @@ to request appropriate resources: ::
 
 Then to build the image run: ::
 
-   $ singularity pull docker://dcanumn/biceps_cmdln:1.3
+   $ singularity pull docker://dcanumn/biceps_cmdln:1.6
 
 The previous command may take up to 3 hours to run and will result in a new .sif file being created
 in your current working directory.
@@ -111,16 +111,23 @@ containing the file list that will be grabbed to run processing. Binding the dir
 the file list is required both so that desired file list can be read, and because by default
 the GUI application will save the list of subjects that met processing requirements to the
 same directory where the file list was taken from (note, this is not necessary for command
-line driven processing): ::
+line driven processing). In most cases we choose to replace the actual paths to a given folder
+with a shorter/easier to interpret name during the binding process. In this case, the input data
+directory is bound with its original name so that the file list (which points to paths within the
+input directory) will not need to be modified. Note that we also provide the current environmental
+display variable to the container. This is necessary for the GUI windows to be visible on your current
+display. This is only necessary for when you want to use BICEPS in the interactive legacy mode.
+Example: ::
 
     $ input_denoised_dir=/path/to/fmri/processing_output/
     $ biceps_output_dir=/path/to/directory/for/biceps/output/
     $ folder_with_file_list=/path/to/folder/containing/file/list/
     $ container_path=/path/to/biceps/singularity/container.sif
     $ singularity run --cleanenv \
-        -B $input_denoised_dir:/input \
+        -B /path/to/fmri/processing_output/:/path/to/fmri/processing_output/ \
         -B $biceps_output_dir:/output \
         -B $folder_with_file_list:/file_list_dir \
+        --env DISPLAY=$DISPLAY
         $container_path
 
 Running biceps_cmdln using an input folder with processed fmri data
