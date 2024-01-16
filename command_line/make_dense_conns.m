@@ -65,7 +65,7 @@ if length(run_masks) > 0
         clear temp_masked;
 
         %Use wb_command to convert the new dtseries into a dconn
-        new_dconn_path = strrep(new_dtseries_path, '.dtseries.nii', 'desc-conn.dconn.nii');
+        new_dconn_path = strrep(new_dtseries_path, '.dtseries.nii', '_desc-conn.dconn.nii');
         command = [wb_path ' -cifti-correlation ' new_dtseries_path ' ' new_dconn_path];
         system(command);
         disp(['Made dconn at: ' new_dconn_path]);
@@ -74,7 +74,7 @@ else
 
     %If there is no mask, then just calculate the dconn on the
     %original dtseries
-    new_dconn_path = [partial_path 'desc-conn.dconn.nii'];
+    new_dconn_path = [partial_path '_desc-conn.dconn.nii'];
     command = [wb_path ' -cifti-correlation ' in_full_path ' ' new_dconn_path];
     system(command);
     disp(['Made dconn at: ' new_dconn_path]);
