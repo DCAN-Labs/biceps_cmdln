@@ -27,7 +27,7 @@ function make_dense_conns(in_folder, in_fname, out_folder, run_masks, mask_descr
 %   smoothing. If smoothing_kernel is 0, this can be set to anything.
 
 in_full_path = fullfile(in_folder, in_fname);
-img_mat = cifti2mat(in_full_path);
+img_mat = cifti2mat(in_full_path, wb_path);
 
 partial_name = split(in_fname, '.');
 partial_name = partial_name{1};
@@ -61,11 +61,11 @@ if length(run_masks) > 0
         new_dtseries_path = strrep(partial_path, '_bold', ['_' mask_descriptions{i} '_bold']);
         new_dtseries_path = [new_dtseries_path '.dtseries.nii'];
         temp_masked = img_mat(:,run_masks{i}==1);
-        mat2cifti(temp_masked, new_dtseries_path, in_full_path);
+        mat2cifti_2(temp_masked, new_dtseries_path, in_full_path, wb_path);
         clear temp_masked;
 
         %Use wb_command to convert the new dtseries into a dconn
-        new_dconn_path = strrep(new_dtseries_path, '.dtseries.nii', '.dconn.nii');
+        new_dconn_path = strrep(new_dtseries_path, '.dtseries.nii', 'desc-conn.dconn.nii');
         command = [wb_path ' -cifti-correlation ' new_dtseries_path ' ' new_dconn_path];
         system(command);
         disp(['Made dconn at: ' new_dconn_path]);
@@ -74,7 +74,7 @@ else
 
     %If there is no mask, then just calculate the dconn on the
     %original dtseries
-    new_dconn_path = [partial_path '.dconn.nii'];
+    new_dconn_path = [partial_path 'desc-conn.dconn.nii'];
     command = [wb_path ' -cifti-correlation ' in_full_path ' ' new_dconn_path];
     system(command);
     disp(['Made dconn at: ' new_dconn_path]);

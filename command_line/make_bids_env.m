@@ -188,7 +188,7 @@ for i=1:n_parcel
             if handles.cmdln.attempt_pconn > 0
                 try
                     out_pconn = [output_path(1:end-3) 'pconn.nii'];
-                    mat2cifti(ind_fconn, out_pconn);
+                    mat2cifti_2(ind_fconn, out_pconn, [], handles.paths.wb_command);
                 catch
                     disp(['Unable to find candidate pconn template for conn. output: ' output_path]);
                 end
@@ -239,7 +239,7 @@ for i=1:n_parcel
             if handles.cmdln.attempt_pconn > 0
                 try
                     out_pconn = [output_path(1:end-3) 'pconn.nii'];
-                    mat2cifti(ind_fconn, out_pconn);
+                    mat2cifti_2(ind_fconn, out_pconn, [], handles.paths.wb_command);
                 catch
                     disp(['Unable to find candidate pconn template for conn. output: ' output_path]);
                 end
@@ -291,7 +291,7 @@ for i=1:n_parcel
             if handles.cmdln.attempt_pconn > 0
                 try
                     out_pconn = [output_path(1:end-3) 'pconn.nii'];
-                    mat2cifti(ind_fconn, out_pconn);
+                    mat2cifti_2(ind_fconn, out_pconn, [], handles.paths.wb_command);
                 catch
                     disp(['Unable to find candidate pconn template for conn. output: ' output_path]);
                 end
@@ -341,6 +341,25 @@ if isfield(handles, 'calc_dense_conns') > 0
         mask_descriptions = {'frames-MaxIndividual', 'frames-MaxGroup', 'frames-MinGroup'};
         make_dense_conns(input_folder, input_filename, output_folder, subject_masks, mask_descriptions, ...
                          handles.dtseries_smoothing_kernel, handles.left_hem_for_smoothing, handles.right_hem_for_smoothing, handles.paths.wb_command)
+
+        %Specific information for JSON file%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%THIS IS COPIED FROM AN ABOVE SECTION AND HASNT BEEN
+        %ADAPTED FOR THIS PART OF THE CODE YET... KEEPING THIS
+        %COMMENTED SECTION BELOW FOR REFERENCE
+        %clear conn_mat_struct;
+        %conn_mat_struct.subject = handles.participants.ids{ix(j)};
+        %conn_mat_struct.session = handles.participants.visit_folder{ix(j)};
+        %conn_mat_struct.good_frames_inds = int8(mask{j,2});
+        %conn_mat_struct.num_included_frames = sum(mask{j,2});
+        %conn_mat_struct.num_excluded_frames = length(mask{j,2}) - sum(mask{j,2});
+        %clear full_struct;
+        %full_struct.conn_mat_struct = conn_mat_struct;
+        %full_struct.standard_struct = standard_struct;
+        %json_content = jsonencode(full_struct, PrettyPrint=true);
+        %json_path = [output_path(1:end-3) 'json'];
+        %fid = fopen(json_path,'w'); 
+        %fprintf(fid,'%s',json_content);
+        %fclose(fid);
 
     end
 end
