@@ -393,3 +393,16 @@ the scan.
             - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.mat
             - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.json
             - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.mat
+
+
+Troubleshooting
+===============
+
+If you see the text listed below after starting up the containerized version of biceps_cmdln
+and after several minutes no additional text has appeared, it is possible that the cache
+directory created by matlab compiler runtime in your home directory is preventing the application
+from moving forward. In this case look for a folder like /home/{InsertGroup}/{InsertUser}/.mcrCache9.12/
+and delete it from your system. Alternatively you should be able to export a new MCR_CACHE_ROOT path
+to the container during processing, and this may also solve the issue. ::
+
+    LD_LIBRARY_PATH is .:/mcr_path/v912/runtime/glnxa64:/mcr_path/v912/bin/glnxa64:/mcr_path/v912/sys/os/glnxa64:/mcr_path/v912/sys/opengl/lib/glnxa64
