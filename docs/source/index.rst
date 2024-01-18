@@ -281,7 +281,7 @@ Arguments
 |
 | **-save_bids**: int. Set to a positive number if you want the output to be saved in BIDS on top of standard BICEPS output format. Default is to not save in this way.  
 |
-| **-attempt_pconn**: 0 or 1, default 0 Set to 1 if you want BICEPS to try making .pconn.nii files out of the generated connectivity matrices. Default = 0. By activating this argument, -save_bids will also be activated.   
+| **-attempt_pconn**: int. Set to positive value if you want BICEPS to try making .pconn.nii files out of the generated connectivity matrices. Default = 0. By activating this argument, -save_bids will also be activated.   
 |
 | **-save_timeseries**: int. Set to positive value if you want to save the timeseries. The saved timeseries will only be propogated to the outputs with standard formatting, not the BIDS formatted outputs. 
 |
@@ -291,9 +291,9 @@ Arguments
 |
 | **-minutes**: float. The minimum amount of data a subject must have to be included in processing, measured in minutes. Default value = 8 min. To convert frames to time, the tool will extract TR from input metadata (file ending in "_mast.mat").
 |
-| **-outlier**: 1 or 0. Whether to remove outliers based on signal variability, default 1.  
+| **-outlier**: int. Set to positive value if you want to remove outliers based on signal variability, default 1.  
 |
-| **-validate_frame_counts**: int. Set to a positive number if you want to validate that all runs have the same number of frames.  
+| **-validate_frame_counts**: int. Set to a positive value if you want to validate that all runs have the same number of frames.  
 |
 | **-wb_command_path**: string. Set the path to wb_command from HCP. By default BICEPS will try to find this path on its own.  
 |
