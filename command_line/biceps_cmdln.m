@@ -130,6 +130,14 @@ else
         mkdir(output_path)
     end
 
+    %Set wb_command path
+    wb_command_path = grab_from_input(keys, values, '-wb_command_path', '/wb_code/workbench/bin_linux64/wb_command');
+    handles.cmdln.wb_command_path = wb_command_path;
+    handles = setfield(handles, 'paths', 'wb_command', wb_command_path);
+
+    %check save bids status
+    handles.save_bids = grab_from_input(keys, values, '-save_bids', 0);
+
     %If the first argument is a directory, use it to make a file list,
     %otherwise accept it as the path to a file list
     subject_info = varargin{1}; %add support for either text file or bids dir
@@ -176,6 +184,9 @@ else
     %Calculate dense conns
     calc_dense_conns = grab_from_input(keys, values, '-make_dense_conns', 0);
     handles.cmdln.calc_dense_conns = calc_dense_conns;
+    if handles.cmdln.calc_dense_conns > 0
+        handles.save_bids = 1;
+    end
 
     %Smoothing kernel for dense conns
     handles.dtseries_smoothing_kernel = grab_from_input(keys, values, '-dtseries_smoothing', 0);
@@ -187,19 +198,16 @@ else
     handles.cmdln.n_skip_vols = skip_vols;
     
     handles.cmdln.attempt_pconn = grab_from_input(keys, values, '-attempt_pconn', 0);
+    if handles.cmdln.attempt_pconn > 0
+        handles.save_bids = 1;
+    end
 
     %Save timeseries
     save_ts = grab_from_input(keys, values, '-save_timeseries', 0);
     if save_ts == 0
         save_ts = -1;
     end
-
-    %workbench command path
-    wb_command_path = grab_from_input(keys, values, '-wb_command_path', '/wb_code/workbench/bin_linux64/wb_command');
-    handles.cmdln.wb_command_path = wb_command_path;
     
-    handles = setfield(handles, 'paths', 'wb_command', wb_command_path);
-    handles.save_bids = grab_from_input(keys, values, '-save_bids', 0);
 
     %Figure out settings for computing dense connectivity matrices (if
     %applicable)
