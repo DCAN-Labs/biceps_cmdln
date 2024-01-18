@@ -149,6 +149,27 @@ assumptions. The code to run this is as follows: ::
         $container_path /input \
         -out_dir /output
 
+Running biceps_cmdln using an input folder with processed fmri data + making dconns
+--------------------------------------------------------------------
+
+If you also want to make dconn images, you will need to set the
+"-make_dense_conns" flag to 1, and bind your home directory to the
+container. Binding your home directory is necessary because some intermediate
+files will get written to this location. Otherwise the syntax is exactly
+the same as what is described in the previous section. After processing you
+will see the dense connectivity files under the general BIDS derivatives formatting
+structure laid out later in this document. Example code: ::
+
+    $ input_denoised_dir=/path/to/fmri/processing_output/
+    $ biceps_output_dir=/path/to/directory/for/biceps/output/
+    $ container_path=/path/to/biceps/singularity/container.sif
+    $ singularity run --cleanenv \
+        -B $input_denoised_dir:/input \
+        -B $biceps_output_dir:/output \
+        -B /home/{insert_group_name}/{insert_user_name}:/home/{insert_group_name}/{insert_user_name} \
+        $container_path /input \
+        -out_dir /output -make_dense_conns 1
+
 
 Running biceps_cmdln using an input file list pointing to sessions
 ------------------------------------------------------------------
@@ -260,7 +281,7 @@ Arguments
 |
 | **-save_bids**: int. Set to a positive number if you want the output to be saved in BIDS on top of standard BICEPS output format. Default is to not save in this way.  
 |
-| **-attempt_pconn**: 0 or 1, default 0 Set to 1 if you want BICEPS to try making .pconn.nii files out of the generated connectivity matrices. Default = 0  
+| **-attempt_pconn**: 0 or 1, default 0 Set to 1 if you want BICEPS to try making .pconn.nii files out of the generated connectivity matrices. Default = 0. By activating this argument, -save_bids will also be activated.   
 |
 | **-save_timeseries**: int. Set to positive value if you want to save the timeseries. The saved timeseries will only be propogated to the outputs with standard formatting, not the BIDS formatted outputs. 
 |
@@ -276,7 +297,7 @@ Arguments
 |
 | **-wb_command_path**: string. Set the path to wb_command from HCP. By default BICEPS will try to find this path on its own.  
 |
-| **-make_dense_conns**: int. Set to positive number to make dconn files from dtseries. Note - you must have corresponding ptseries files for this to work. The output dconn files will have the same temporal masking as the pconn files.   
+| **-make_dense_conns**: int. Set to positive number to make dconn files from dtseries. Note - you must have corresponding ptseries files for this to work. The output dconn files will have the same temporal masking as the pconn files. By activating this argument, -save_bids will also be activated.   
 |
 | **-dtseries_smoothing**: float. The amount of smoothing to use, for both surface and volume space, in millimeters (sigma of gaussian kernel). This only is used if -make_dense_conns flag is activated.  
 |
@@ -367,8 +388,10 @@ will be made under the output directory adjacent to the "standard" directory des
 last section. Under the "bids" folder will be subject, session, and func folders, followed by
 specific files for a given session that were generated during processing. An example of a
 subject folder structure under "bids" is seen below. For each parcellation there will be files
-for the three different frame sampling schemes, and .mat and .json files containing the underlying
-connectivity data and the settings used to generate those connectivity estimates, respectively.
+for the three different frame sampling schemes, and at minimum .mat and .json files containing the
+underlying connectivity data and the settings used to generate those connectivity estimates, respectively.
+If the setting "-attempt_pconn" is enabled, biceps_cmdln will also attempt to create files with a similar
+name ending ".pconn.nii" that can be used to visualize connectivity data within HCP workbench tools.
 
 All the .mat files will contain an "ind_fconn" variable that is <m,m>, where m is the number
 of regions in the parcellation. 
@@ -378,21 +401,40 @@ the frames used during processing, the total number of included and excluded fra
 details like the framewise displacement threshold, and number of skip volumes applied at the beginning of
 the scan.
 
+Finally if the "-make_dense_conns" argument is enabled, scrubbed timeseries files ending in ".dtseries.nii"
+and connectivity matrices ending in ".dconn.nii" will be created. If a smoothing kernel is specified during processing
+the level of smoothing will be reflected in the name of both dense cifti files. Because all arguments/frames used for
+processing the parcellated connectivity matrices will be propogated to the processing of the dense files, the json files
+created for the parcellated connectivity matrices can be used to view the processing settings that were used for
+constructing the dense files.
+
 - ── sub-01
     - ──  ses-01
         - ──  func
             - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.json
             - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.mat
+            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.pconn.nii
             - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.json
             - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.mat
+            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.pconn.nii
             - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.json
             - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.mat
+            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.pconn.nii
             - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.json
             - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.mat
+            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.pconn.nii
             - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.json
             - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.mat
+            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.pconn.nii
             - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.json
             - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.mat
+            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.pconn.nii
+            - ── sub-01_ses-01_task-rest_smoothing-15mm_frames-MaxGroup_bold_timeseries.dtseries.nii
+            - ── sub-01_ses-01_task-rest_smoothing-15mm_frames-MaxGroup_bold_timeseries_desc-conn.dconn.nii
+            - ── sub-01_ses-01_task-rest_smoothing-15mm_frames-MaxIndividual_bold_timeseries.dtseries.nii
+            - ── sub-01_ses-01_task-rest_smoothing-15mm_frames-MaxIndividual_bold_timeseries_desc-conn.dconn.nii
+            - ── sub-01_ses-01_task-rest_smoothing-15mm_frames-MinGroup_bold_timeseries.dtseries.nii
+            - ── sub-01_ses-01_task-rest_smoothing-15mm_frames-MinGroup_bold_timeseries_desc-conn.dconn.nii
 
 
 Troubleshooting
