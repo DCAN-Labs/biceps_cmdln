@@ -72,7 +72,7 @@ to request appropriate resources: ::
 
 Then to build the image run: ::
 
-   $ singularity pull docker://dcanumn/biceps_cmdln:1.6
+   $ singularity pull docker://dcanumn/biceps_cmdln:1.8
 
 The previous command may take up to 3 hours to run and will result in a new .sif file being created
 in your current working directory.
