@@ -293,7 +293,7 @@ Arguments
 |
 | **-outlier**: int. Set to positive value if you want to remove outliers based on signal variability, default 1.  
 |
-| **-validate_frame_counts**: int. Set to a positive value if you want to validate that all runs have the same number of frames.  
+| **-validate_frame_counts**: int. Set to a positive value if you want to validate that all runs have the same number of frames. Defaults to 0.
 |
 | **-wb_command_path**: string. Set the path to wb_command from HCP. By default BICEPS will try to find this path on its own.  
 |
