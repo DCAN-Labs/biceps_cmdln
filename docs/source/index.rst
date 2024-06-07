@@ -289,7 +289,7 @@ Arguments
 |
 | **-n_skip_vols**: int. The number of frames to skip at the beginning of every scan. Default is 5. Remember - if you are working with concatenated runs, this will only remove frames from the first run in the concatenated series.   
 |
-| **-minutes**: float. The minimum amount of data a subject must have to be included in processing, measured in minutes. Default value = 8 min. To convert frames to time, the tool will extract TR from input metadata (file ending in "_mast.mat").
+| **-minutes**: float. WARNING. There is a suspected bug in this flag. With that in mind it is likely that the default time of 8 minutes can not be changed at the moment. Intended functioning: The minimum amount of data a subject must have to be included in processing, measured in minutes. Default value = 8 min. To convert frames to time, the tool will extract TR from input metadata (file ending in "_mast.mat").
 |
 | **-outlier**: int. Set to positive value if you want to remove outliers based on signal variability, default 1.  
 |
