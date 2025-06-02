@@ -18,10 +18,10 @@ data that has been (1) denoised, (2) projected into a parcellated cifti space,
 (3) concatenated [in the case where multiple versions of a run type exist], and (4)  
 formatted using general BIDS Derivatives principles.
 
-Further, because this tool makes use of certain assumptions about the formatting of
-input data - using this pipeline is only recommended if you are using tools developed  
-by the DCAN group at the University of Minnesota to denoise and parcellate
-your fMRI data.  
+Note: This pipeline is designed to work seamlessly with data formatted according to conventions used by tools
+developed by the DCAN group at the University of Minnesota, particularly for denoising and parcellation of 
+fMRI data. To ensure optimal compatibility and performance, we recommend using it with data processed through 
+these tools.
 
 biceps_cmdln is specifically designed to calculate functional connectivity  
 matrices for a group of individuals. With this in mind, it is easiest to use  
@@ -37,16 +37,17 @@ underlying matrices. The three types are:
 * MinGroup - where only the minimum requirement for number of frames will be used. For example if 5 min is required and the TR is 2 seconds, only 150 frames (30*5) will be used for each run.
 * MaxGroup - where the maximum number of frames are used that allows for a consistent number of frames across runs. For example if the worst run in the group has 160 frames, then 160 frames will be used as a threshold for all other runs in the study.
 
-From the above description it is seen that the MaxGroup type connectivity matrices will  
-change as a function of which runs are included in the study. In general, the results of  
-biceps_cmdln are generally expected to change upon reprocessing even if the same runs are  
-given as input. This is expected behavior because the individual frames in the MinGroup and 
-MaxGroup cases will be randomly selected among high quality frames for a given run.
+Note: The MaxGroup-type connectivity matrices will only change if different individuals are included in the 
+group, if different imaging data is used, or if the frame selection criteria (e.g., FD thresholds) change. 
+Contrary to what might be inferred, reprocessing the same set of runs with identical parameters should not 
+affect MaxGroup results, since the high-quality frames included are determined consistently across subjects. 
+However, for MinGroup and other individual-level analyses, some variability may occur due to random selection 
+among qualifying frames within a run.
 
 Beyond calculating functional connectivity matrices based on .ptseries.nii files, biceps_cmdln
 can also be used to calculate .dconn.nii files from .dtseries.nii files. Because the file 
 selection algorithm behind biceps_cmdln utilizes .ptseries.nii files to operate, both .ptseries.nii
-files and .dtseries.nii files must be present for every subject if you want to calculate so-called
+files and .dtseries.nii files must be present for every subject if you want to calculate 
 "dense" connectivity matrices. During this procedure the same temporal mask that determines which
 frames will be included/excluded for calculating connectivity matrices from .ptseries.nii files will also
 be applied to the .dtseries.nii file. See "Calculating Dense Connectivity Matrices" section for more
@@ -58,13 +59,15 @@ Downloading biceps_cmdln
 Singularity Container
 ---------------------
 
-It is recommended that users run biceps_cmdln as a singularity image.
-This means that the user must have singularity installed on their system.
-Using a singularity image ensures that the user doesn't have to have Matlab or HCP Connectome Workbench
-tools installed on their system. To download the container, go to the
+It is recommended that users run biceps_cmdln using the provided Singularity container. 
+This approach ensures that you do not need to have MATLAB or the HCP Connectome Workbench 
+tools installed locally, simplifying setup and enhancing reproducibility. To use this option, 
+you must have Singularity installed on your system.
+
+To download the container, go to the
 `DCAN Labs docker hub page <https://hub.docker.com/u/dcanumn>`_ and download the
 most recent version of biceps_cmdln. When building the image on your local machine,
-ensure that you have 100gb of /tmp space before initiating the build process. If
+please ensure that you have 100gb of /tmp space before initiating the build process. If
 you are building biceps_cmdln within a SLURM job at UMN, you can use the following code
 to request appropriate resources: ::
 
@@ -77,22 +80,41 @@ Then to build the image run: ::
 The previous command may take up to 3 hours to run and will result in a new .sif file being created
 in your current working directory.
 
+Note: While the Singularity container version of biceps_cmdln is fully functional and generally recommended, 
+there are known issues affecting certain customization flags, such as --fd and --min. If your analysis 
+relies heavily on these options, please consult the documentation or GitHub issues page for the most 
+up-to-date guidance and potential workarounds.
+
 
 Github
 ------
 
-Alternatively, it is possible to clone the
-`github repository for biceps_cmdln <https://github.com/DCAN-Labs/biceps_cmdln>`_. If you choose to
-interact with biceps_cmdln in this way, you will want to have matlab and the HCP Conectome Workbench
-tools first installed on your system. After you start up Matlab go to the biceps_cmdln folder and add
-all files (recursively) to the matlab path. Then you should be able to type "biceps_cmdln" and to run
-the application in a similar fashion to what is described in the following sections, using the same flags. Importantly, biceps_cmdln
-assumes that the path to HCP Connectome Workbench tools are at a specific path within the container and this
-path will no longer be correct. So when running biceps_cmdln you will either want to edit the default wb_command path
-within the biceps_cmdln function or use the "wb_command_path" flag to provide a new path to wb_command whenever
-running the application. Also if you want to use biceps_cmdln in the GUI mode, then you will need to edit the
-field handles.paths.wb_command within the settings_make_par_env.m script. It is not recommended that you
-run biceps_cmdln directly in Matlab. Rather it is recommended that you only use the singularity code to run biceps_cmdln.
+For users who require full access to all customization options and flags  including features like 
+--fd, --min, and GUI mode  the most flexible and robust way to run biceps_cmdln is by cloning the 
+GitHub repository and running it directly in MATLAB.
+
+To do this:
+
+1. Clone the `github repository for biceps_cmdln <https://github.com/DCAN-Labs/biceps_cmdln>`_.
+
+2. Ensure that **MATLAB** and the **HCP Connectome Workbench** tools are installed on your system.
+
+3. Launch MATLAB, navigate to the biceps_cmdln folder, and add all files (recursively) to the MATLAB 
+path. This can be done using::
+
+   $ addpath(genpath('path/to/biceps_cmdln'))
+
+4. You can now run biceps_cmdln like any other MATLAB function, using the same flags described in the 
+documentation and CLI instructions.
+
+**Important:** When running outside of the Singularity container, biceps_cmdln assumes a default path 
+to the Workbench command-line tools (wb_command) that may not match your system. You can either:
+* Edit the default path inside the biceps_cmdln.m function, or
+* Use the --wb_command_path flag to specify the correct path during each run.
+
+While running biceps_cmdln from within a Singularity container is convenient and reduces setup 
+requirements, it may have limitations with certain customization flags. Therefore, we recommend 
+using the native MATLAB version when full functionality or advanced customization is needed.
 
 
 Ways of running biceps_cmdln

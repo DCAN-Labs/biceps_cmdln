@@ -26,6 +26,7 @@ end
 if ~isfile(path_cifti)
     path_cifti = strrep(path_cifti,'atlas','roi');
 end
+
 to_run = [path_wb_c ' -cifti-convert -to-text ' quotes_if_space(path_cifti) ' ' temp_csv];
 %% Send instruction to be executed on your local system
 
