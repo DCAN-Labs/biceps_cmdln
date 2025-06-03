@@ -35,7 +35,11 @@ def build_matlab_command(input_list, flags):
         args.append(f"'{k}'")
         args.append(val)
     args_str = ", ".join(args)
-    return f"biceps_cmdln({args_str}); exit;"
+
+    out_dir = flags["-out_dir"]
+    rename_call = f"rename_biceps_files('{out_dir}')"
+
+    return f"biceps_cmdln({args_str}); {rename_call}; exit;"
 
 def parse_flags(flag_args):
     flags = {}
@@ -60,10 +64,14 @@ def parse_flags(flag_args):
         flags[key] = value
         i += 2
 
-    # Inject defaults for missing flags
+    # Inject defaults
     for key, default_value in DEFAULTS.items():
         if key not in flags:
             flags[key] = default_value
+
+    # Ensure -out_dir is provided
+    if "-out_dir" not in flags:
+        raise ValueError("Missing required flag: '-out_dir'")
 
     return flags
 

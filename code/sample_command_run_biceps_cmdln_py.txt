@@ -1,1 +1,1 @@
-python run_biceps_cmdln.py /home/miran045/shared/code/internal/pipelines/biceps_work/for_testing/full_input_dir -fd 0.1
+python run_biceps_cmdln.py /home/miran045/shared/code/internal/pipelines/biceps_work/for_testing/full_input_dir -fd 0.1 -out_dir /home/miran045/shared/code/internal/pipelines/biceps_work/temp_outputs
