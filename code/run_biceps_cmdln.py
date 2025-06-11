@@ -4,6 +4,7 @@ import argparse
 import subprocess
 import os
 import sys
+import scipy.io
 
 # Known valid BICEPS flags and their expected types
 VALID_FLAGS = {
@@ -91,6 +92,35 @@ def main():
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
 
+    # If -custom_dtvar_folder is not provided, check variance files
+    if "-custom_dtvar_folder" not in flags:
+        check_command = [
+            "matlab",
+            "-nodesktop",
+            "-nosplash",
+            "-r",
+            (
+                f"cd('{os.getcwd()}'); "
+                f"addpath(genpath('{os.getcwd()}/biceps_cmdln')); "
+                f"success=check_and_patch_variance('{args.input_list}'); "
+                f"save('check_result.mat','success'); exit;"
+            )
+        ]
+
+        print("Checking for missing variance files...")
+        subprocess.run(check_command, check=True)
+
+        mat_result = scipy.io.loadmat("check_result.mat")
+        success_flag = mat_result.get("success", [[1]])[0][0]
+        
+        os.remove("check_result.mat")
+
+        if success_flag == 0:
+            custom_dtvar_location=os.path.join(os.getcwd(), "dtvariance_files")
+            flags["-custom_dtvar_folder"] = custom_dtvar_location
+            print("Variance patch triggered, setting -custom_dtvar_folder to", custom_dtvar_location)
+
+    # Build and run the main MATLAB command
     matlab_call = build_matlab_command(args.input_list, flags)
 
     matlab_command = [

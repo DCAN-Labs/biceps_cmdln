@@ -1,1 +1,6 @@
+source /home/faird/shared/code/external/envs/miniconda3/load_miniconda3.sh
+# Below is if all necessary information is in the input directory
 python run_biceps_cmdln.py /home/miran045/shared/code/internal/pipelines/biceps_work/for_testing/full_input_dir -fd 0.1 -out_dir /home/miran045/shared/code/internal/pipelines/biceps_work/temp_outputs
+
+# Below is if all necessary information except for dtvariance files are in the input directory
+python run_biceps_cmdln.py /home/miran045/shared/code/internal/pipelines/biceps_work/for_testing/biceps_inputs_from_erik/ -fd 0.1 -out_dir /home/miran045/shared/code/internal/pipelines/biceps_work/temp_outputs
