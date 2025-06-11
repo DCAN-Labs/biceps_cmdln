@@ -81,7 +81,7 @@ def main():
     )
     parser.add_argument("input_list", help="Path to input folder or file list")
     parser.add_argument("flags", nargs=argparse.REMAINDER,
-                        help="Key-value flag arguments for biceps_cmdln")
+                        help="Key-value flag arguments for biceps_cmdln, required flag -out_dir")
 
     args = parser.parse_args()
 
