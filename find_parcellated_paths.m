@@ -48,13 +48,29 @@ for k=1:n
     n_nii=length(nii_files);
     nii_files_temp=cell(n_nii,1);
     for x = 1:n_nii
-        pt = split(nii_files{x},'atlas-');
-        if size(pt) < 2
-            pt = split(nii_files{x},'roi-');
-            nii_files{x} = strrep(nii_files{x},'atlas','roi');
-            disp(nii_files{x})
+        filename = nii_files{x};
+        [~, name, ~] = fileparts(filename);
+
+        % Try 'atlas-' first
+        if contains(name, 'atlas-')
+            pt = split(name, 'atlas-');
+            nii_files_temp{x} = pt{2};
+
+        % Then try 'roi-'
+        elseif contains(name, 'roi-')
+            pt = split(name, 'roi-');
+            nii_files_temp{x} = pt{2};
+
+        % Fallback: find token just before '_timeseries'
+        else
+            tokens = split(name, '_');
+            ts_index = find(contains(tokens, 'timeseries'), 1);
+            if ~isempty(ts_index) && ts_index > 1
+                nii_files_temp{x} = tokens{ts_index - 1};
+            else
+                error('Could not extract parcellation name from: %s', filename);
+            end
         end
-        nii_files_temp{x} = pt{2};
     end
     parcel_names{k}=nii_files_temp;
     temp=cell(n_nii,1);

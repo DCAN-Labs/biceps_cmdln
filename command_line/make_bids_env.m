@@ -54,9 +54,9 @@ save_planB(mask_file,mask);%n_frames
 
 %% Read parcellated data
 full_filenames_first_parc = {}; %later in the script this will help us find
-                                %dtseries files if needed
+%dtseries files if needed
 for i=1:n_parcel
-    
+
     % Identify parcel and preallocate memory
     if gui > 0
         j=strcmp(cat(1,{handles.cbh.String}'),strtrim(char(handles.mc.surv_parcels{i})));
@@ -80,17 +80,13 @@ for i=1:n_parcel
     %disp(['Processing participant ' num2str(j) ' out of ' num2str(n_surv) ' in parcel ' handles.mc.surv_parcels{i} ' (' num2str(i) ' out of ' num2str(n_parcel) '), standard']);
     path_to_nii=[strtrim(handles.participants.full_path(ix(j),:)) fs 'func'];
 
-    try
-        filename=strjoin([handles.participants.ids(ix(j),:) '_' handles.participants.visit_folder(ix(j),:) '*-rest*bold_atlas-' handles.mc.surv_parcels{i} '.nii'],'');
-        local_filename=strtrim(ls([path_to_nii fs filename]));
-    catch
-        filename=strjoin([handles.participants.ids(ix(j),:) '_' handles.participants.visit_folder(ix(j),:) '*-rest*bold*-' handles.mc.surv_parcels{i} '.nii'],'');
-        local_filename=strtrim(ls([path_to_nii fs filename]));
-    end
-    
+    subj_id = strtrim(handles.participants.ids(ix(j),:));
+    visit_id = strtrim(handles.participants.visit_folder(ix(j),:));
+    local_filename = find_matching_parcel_file(path_to_nii, subj_id, visit_id, handles.mc.surv_parcels{i});
+
     [group_folder,~,~] = fileparts(handles.groupFile);
     TEMP_RAW = read_cifti_via_csv (local_filename,quotes_if_space(handles.paths.wb_command), group_folder);
-    
+
     temp_raw_masked=TEMP_RAW(:,mask{j,1});% mask raw timecourses
     if handles.save_raw_timecourses_flag
         raw_tc{j}=TEMP_RAW;
@@ -98,38 +94,31 @@ for i=1:n_parcel
 
     n_rois=size(TEMP_RAW,1);
     fconn=zeros(n_rois,n_rois,n_surv);
-    
+
     file_names = {};
     for j=1:n_surv
         disp(['Processing participant ' num2str(j) ' out of ' num2str(n_surv) ' in parcel ' handles.mc.surv_parcels{i} ' (' num2str(i) ' out of ' num2str(n_parcel) '), standard']);
-        path_to_nii=[strtrim(handles.participants.full_path(ix(j),:)) fs 'func'];
-        filename=strjoin([handles.participants.ids(ix(j),:) '_' handles.participants.visit_folder(ix(j),:) '*-rest*bold_atlas-' handles.mc.surv_parcels{i} '.nii'],'');
-        try
-            filename=strjoin([handles.participants.ids(ix(j),:) '_' handles.participants.visit_folder(ix(j),:) '*-rest*bold_atlas-' handles.mc.surv_parcels{i} '.nii'],'');
-            local_filename=strtrim(ls([path_to_nii fs filename]));
-        catch
-            filename=strjoin([handles.participants.ids(ix(j),:) '_' handles.participants.visit_folder(ix(j),:) '*-rest*bold*-' handles.mc.surv_parcels{i} '.nii'],'');
-            local_filename=strtrim(ls([path_to_nii fs filename]));
-        end
+        path_to_nii = [strtrim(handles.participants.full_path(ix(j), :)) fs 'func'];
+        subj_id = strtrim(handles.participants.ids(ix(j), :));
+        visit_id = strtrim(handles.participants.visit_folder(ix(j), :));
+        parcel = strtrim(handles.mc.surv_parcels{i});  % <-- add this line
 
-        %Grab the filename for later in case we want to use it to find
-        %dense tseries files.
+        local_filename = find_matching_parcel_file(path_to_nii, subj_id, visit_id, parcel);
+
         if i == 1
             full_filenames_first_parc{j} = local_filename;
         end
-        
-        TEMP_RAW=read_cifti_via_csv(local_filename,quotes_if_space(handles.paths.wb_command), group_folder);
-        raw_tc{j}=TEMP_RAW;
+
+        TEMP_RAW = read_cifti_via_csv(local_filename, quotes_if_space(handles.paths.wb_command), group_folder);
+        raw_tc{j} = TEMP_RAW;
 
         [~, b, ~] = fileparts(local_filename);
         b_split = split(b, '.');
         file_names{j} = [b_split{1} '.mat'];
-
-
     end
 
     %NEW Part 1%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+
     for j=1:n_surv
         fconn(:,:,j)=corr(raw_tc{j}(:,mask{j,1}==1).');
     end
@@ -138,7 +127,7 @@ for i=1:n_parcel
     save_planB([parcel_folder fs file_fconn],fconn);
 
     if handles.save_bids
-        
+
         clear standard_struct;
         standard_struct.fd_thresh_mm = handles.cmdln.fd_thresh;
         standard_struct.time_thresh_min = handles.cmdln.time_thresh_min;
@@ -146,15 +135,15 @@ for i=1:n_parcel
         standard_struct.n_skip_vols = handles.cmdln.n_skip_vols;
         standard_struct.workbench_path = handles.cmdln.wb_command_path;
         standard_struct.validate_frame_counts = handles.cmdln.validate_frame_counts;
-        
-        
-        
+
+
+
         for j = 1 : n_surv
             generic_name = file_names{j};
             if (contains(generic_name, '_bold') == false)
                 error('Error BIDS output only supported for files with _bold in their name')
             end
-    
+
             %Make output folder for given subject/session combo if it doesnt
             %exist
             output_folder = fullfile(handles.env.path_gagui, 'bids', handles.participants.ids{ix(j)}, handles.participants.visit_folder{ix(j)}, 'func');
@@ -168,7 +157,7 @@ for i=1:n_parcel
             output_path = fullfile(output_folder, temp_name);
             ind_fconn = squeeze(fconn(:,:,j));
             save(output_path, 'ind_fconn');
-            
+
             %Specific information for JSON file%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             clear conn_mat_struct;
             conn_mat_struct.subject = handles.participants.ids{ix(j)};
@@ -181,10 +170,10 @@ for i=1:n_parcel
             full_struct.standard_struct = standard_struct;
             json_content = jsonencode(full_struct, PrettyPrint=true);
             json_path = [output_path(1:end-3) 'json'];
-            fid = fopen(json_path,'w'); 
+            fid = fopen(json_path,'w');
             fprintf(fid,'%s',json_content);
             fclose(fid);
-            
+
             if handles.cmdln.attempt_pconn > 0
                 try
                     out_pconn = [output_path(1:end-3) 'pconn.nii'];
@@ -219,7 +208,7 @@ for i=1:n_parcel
             output_path = fullfile(output_folder, temp_name);
             ind_fconn = squeeze(fconn(:,:,j));
             save(output_path, 'ind_fconn');
-            
+
             %Specific information for JSON file%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             clear conn_mat_struct;
             conn_mat_struct.subject = handles.participants.ids{ix(j)};
@@ -232,10 +221,10 @@ for i=1:n_parcel
             full_struct.standard_struct = standard_struct;
             json_content = jsonencode(full_struct, PrettyPrint=true);
             json_path = [output_path(1:end-3) 'json'];
-            fid = fopen(json_path,'w'); 
+            fid = fopen(json_path,'w');
             fprintf(fid,'%s',json_content);
             fclose(fid);
-            
+
             if handles.cmdln.attempt_pconn > 0
                 try
                     out_pconn = [output_path(1:end-3) 'pconn.nii'];
@@ -271,7 +260,7 @@ for i=1:n_parcel
             output_path = fullfile(output_folder, temp_name);
             ind_fconn = squeeze(fconn(:,:,j));
             save(output_path, 'ind_fconn');
-            
+
             %Specific information for JSON file%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             clear conn_mat_struct;
             conn_mat_struct.subject = handles.participants.ids{ix(j)};
@@ -284,10 +273,10 @@ for i=1:n_parcel
             full_struct.standard_struct = standard_struct;
             json_content = jsonencode(full_struct, PrettyPrint=true);
             json_path = [output_path(1:end-3) 'json'];
-            fid = fopen(json_path,'w'); 
+            fid = fopen(json_path,'w');
             fprintf(fid,'%s',json_content);
             fclose(fid);
-            
+
             if handles.cmdln.attempt_pconn > 0
                 try
                     out_pconn = [output_path(1:end-3) 'pconn.nii'];
@@ -302,13 +291,13 @@ for i=1:n_parcel
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+
     disp(['Saving data from parcel ' handles.mc.surv_parcels{i} ' (' num2str(i) ' out of ' num2str(n_parcel) ')']);
     if handles.save_raw_timecourses_flag
         save_planB([parcel_folder fs handles.env.raw_tc],raw_tc);
     end
 
-    
+
 end
 
 
@@ -340,7 +329,7 @@ if isfield(handles, 'calc_dense_conns') > 0
         subject_masks = mask(i,:);
         mask_descriptions = {'frames-MaxIndividual', 'frames-MaxGroup', 'frames-MinGroup'};
         make_dense_conns(input_folder, input_filename, output_folder, subject_masks, mask_descriptions, ...
-                         handles.dtseries_smoothing_kernel, handles.left_hem_for_smoothing, handles.right_hem_for_smoothing, handles.paths.wb_command)
+            handles.dtseries_smoothing_kernel, handles.left_hem_for_smoothing, handles.right_hem_for_smoothing, handles.paths.wb_command)
 
         %Specific information for JSON file%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%THIS IS COPIED FROM AN ABOVE SECTION AND HASNT BEEN
@@ -357,12 +346,12 @@ if isfield(handles, 'calc_dense_conns') > 0
         %full_struct.standard_struct = standard_struct;
         %json_content = jsonencode(full_struct, PrettyPrint=true);
         %json_path = [output_path(1:end-3) 'json'];
-        %fid = fopen(json_path,'w'); 
+        %fid = fopen(json_path,'w');
         %fprintf(fid,'%s',json_content);
         %fclose(fid);
 
     end
 end
-   
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
