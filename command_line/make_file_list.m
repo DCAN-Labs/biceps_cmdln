@@ -48,6 +48,14 @@ for i = 1:length(output_files)
         end
     end
     
+    % Fallback X2: use token before 'Subcortical'
+    if isempty(roi_token)
+        timeseries_index = find(contains(tokens, 'subcortical', 'IgnoreCase', true), 1);
+        if ~isempty(timeseries_index) && timeseries_index > 1
+            roi_token = tokens{timeseries_index - 1};
+        end
+    end
+
     % Error if still not found
     if isempty(roi_token)
         error(['Error: Could not determine parcellation in ' output_files(i).name]);
