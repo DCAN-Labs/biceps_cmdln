@@ -45,17 +45,18 @@ Connectivity Matrix Types
 
 For each run with sufficient data, three versions of the functional connectivity matrix are generated per parcellation:
 
-+------------------+---------------------------------------------------------------------------------------------------------------------+
-| Matrix Type      | Description                                                                                                         |
-+==================+=====================================================================================================================+
-| **MaxIndividual**| Uses **all good frames** available for each individual's run. Maximizes within-subject data usage.                 |
-+------------------+---------------------------------------------------------------------------------------------------------------------+
-| **MinGroup**     | Uses a **fixed minimum number of frames** across all individuals. For example, if 5 minutes are needed at TR=2s,    |
-|                  | then 150 frames are used consistently (5 × 60 ÷ 2).                                                                 |
-+------------------+---------------------------------------------------------------------------------------------------------------------+
-| **MaxGroup**     | Uses the **maximum number of frames that all runs can share**. For example, if the shortest valid run in the group  |
-|                  | has 160 frames, then all matrices use 160 frames for consistency.                                                   |
-+------------------+---------------------------------------------------------------------------------------------------------------------+
+- **MaxIndividual**:  
+  Uses all good frames available for each individual's run.  
+  Maximizes within-subject data usage.
+
+- **MinGroup**:  
+  Uses a fixed minimum number of frames across all individuals.  
+  For example, if 5 minutes are required and TR is 2 seconds, then 150 frames (5 * 60 / 2) are used consistently.
+
+- **MaxGroup**:  
+  Uses the maximum number of frames that all runs can share.  
+  For example, if the shortest valid run in the group has 160 frames, then 160 frames are used for all runs to ensure consistency.
+
 
 .. note::
 
@@ -243,17 +244,19 @@ Options:
 ---
 
 Summary of Usage Options
--------------------------
+------------------------
 
-+--------------------+----------------------------------------------+-----------------------------+
-| Method             | Best For                                     | Requires MATLAB?           |
-+====================+==============================================+=============================+
-| Python Wrapper     | Most users, scripting, CLI flags, automation |  Yes (runs behind scenes) |
-+--------------------+----------------------------------------------+-----------------------------+
-| Singularity        | Reproducibility, no MATLAB, containers       | L No                       |
-+--------------------+----------------------------------------------+-----------------------------+
-| Native MATLAB      | Development, debugging, full customization   |  Yes (interactive)        |
-+--------------------+----------------------------------------------+-----------------------------+
+- **Python Wrapper**  
+  - **Best for:** Most users, scripting, CLI flags, automation  
+  - **Requires MATLAB?** Yes (runs behind the scenes)
+
+- **Singularity**  
+  - **Best for:** Reproducibility, no MATLAB installation, HPC/container environments  
+  - **Requires MATLAB?** No
+
+- **Native MATLAB**  
+  - **Best for:** Development, debugging, full customization, GUI mode  
+  - **Requires MATLAB?** Yes (interactive use)
 
 
 
@@ -509,15 +512,17 @@ This file is used by ``biceps_cmdln`` to:
 **Summary of Required Files per Run**
 -------------------------------------
 
-+----------------------+-------------------------------+-------------------------------------------+
-| File Type            | Extension                     | Purpose                                   |
-+======================+===============================+===========================================+
-| Parcellated Timeseries | `.ptseries.nii`               | Main input for connectivity calculation   |
-+----------------------+-------------------------------+-------------------------------------------+
-| Signal Variance       | `_variance.txt`                | Detect frame-level outliers               |
-+----------------------+-------------------------------+-------------------------------------------+
-| Motion + TR Info      | `_mask.mat`                    | Identify high-motion frames and TR        |
-+----------------------+-------------------------------+-------------------------------------------+
+- **Python Wrapper**  
+  - **Best for:** Most users, scripting, CLI flags, automation  
+  - **Requires MATLAB?** Yes (runs behind the scenes)
+
+- **Singularity**  
+  - **Best for:** Reproducibility, no MATLAB installation, HPC/container environments  
+  - **Requires MATLAB?** No
+
+- **Native MATLAB**  
+  - **Best for:** Development, debugging, full customization, GUI mode  
+  - **Requires MATLAB?** Yes (interactive use)
 
 .. note::
 
@@ -538,18 +543,12 @@ followed by **optional key/value flags** for customization.
 Positional Argument
 -------------------
 
-+---------+------------------------------------------------------------+
-| Argument | Description                                                |
-+=========+============================================================+
-| input   | **Optional.** If omitted, ``biceps_cmdln`` launches the GUI.|
-|         | If provided, can be:                                        |
-|         |                                                            |
-|         | 1. **Path to a study directory** (BIDS-derivatives format)  |
-|         | 2. **Path to a file list** with session directories (one    |
-|         |    per line)                                                |
-+---------+------------------------------------------------------------+
+- **input** *(optional)*  
+  - If omitted, ``biceps_cmdln`` launches the GUI.  
+  - If provided, it can be one of:  
+    1. **Path to a study directory** (BIDS-derivatives format)  
+    2. **Path to a file list** with session directories (one per line)
 
----
 
 Optional Key/Value Flags
 ------------------------
@@ -560,60 +559,64 @@ Each flag is formatted as: ::
 
 The table below summarizes available flags:
 
-+-----------------------+---------+-----------------------------+--------------------------------------------+
-| Flag                  | Type    | Default                     | Description                                |
-+=======================+=========+=============================+============================================+
-| **-out_dir**          | str     | `.` (current dir)           | Output directory for BICEPS results. **Bind |
-|                       |         |                             | this path** if using Singularity.           |
-+-----------------------+---------+-----------------------------+--------------------------------------------+
-| **-save_bids**        | int     | 0                           | Save results in **BIDS format** in addition |
-|                       |         |                             | to standard BICEPS output.                  |
-+-----------------------+---------+-----------------------------+--------------------------------------------+
-| **-attempt_pconn**    | int     | 0                           | Generate `.pconn.nii` files from matrices.  |
-|                       |         |                             | Also activates `-save_bids`.                |
-+-----------------------+---------+-----------------------------+--------------------------------------------+
-| **-save_timeseries**  | int     | 0                           | Save parcellated timeseries to standard     |
-|                       |         |                             | outputs (not BIDS).                         |
-+-----------------------+---------+-----------------------------+--------------------------------------------+
-| **-fd**               | float   | 0.2                         | Framewise displacement threshold (mm).      |
-+-----------------------+---------+-----------------------------+--------------------------------------------+
-| **-n_skip_vols**      | int     | 5                           | Frames to skip at **start of each scan**.   |
-|                       |         |                             | For concatenated runs, only the **first**   |
-|                       |         |                             | run is affected.                            |
-+-----------------------+---------+-----------------------------+--------------------------------------------+
-| **-minutes**          | float   | 8                           | **Min usable data per subject (minutes).**  |
-|                       |         |                             | **Warning:** Known bug prevents changing    |
-|                       |         |                             | this from default in some versions.         |
-+-----------------------+---------+-----------------------------+--------------------------------------------+
-| **-outlier**          | int     | 1                           | Remove high-variance frames (3 MAD rule).   |
-|                       |         |                             | Set to 0 to disable removal (files still    |
-|                       |         |                             | required).                                  |
-+-----------------------+---------+-----------------------------+--------------------------------------------+
-| **-validate_frame_counts** | int | 0                           | Check that all runs have **same frame count**|
-|                       |         |                             | before processing.                          |
-+-----------------------+---------+-----------------------------+--------------------------------------------+
-| **-wb_command_path**  | str     | Auto-detected               | Path to HCP ``wb_command`` binary. Use this |
-|                       |         |                             | if not on PATH or using custom Workbench.   |
-+-----------------------+---------+-----------------------------+--------------------------------------------+
-| **-make_dense_conns** | int     | 0                           | Generate `.dconn.nii` from `.dtseries.nii`. |
-|                       |         |                             | Requires matching `.ptseries.nii` files.    |
-|                       |         |                             | Activates `-save_bids`.                     |
-+-----------------------+---------+-----------------------------+--------------------------------------------+
-| **-dtseries_smoothing** | float | 0                           | Gaussian smoothing (mm, sigma) for dense    |
-|                       |         |                             | matrices. Only used if `-make_dense_conns`. |
-+-----------------------+---------+-----------------------------+--------------------------------------------+
-| **-left_hem_surface** | str     | Internal default            | Path to subject-specific **L midthickness** |
-|                       |         |                             | surface for smoothing. Required for         |
-|                       |         |                             | subject-specific smoothing; else defaults   |
-|                       |         |                             | to fslr template.                           |
-+-----------------------+---------+-----------------------------+--------------------------------------------+
-| **-right_hem_surface**| str     | Internal default            | Same as above, but for **R hemisphere**.    |
-+-----------------------+---------+-----------------------------+--------------------------------------------+
-| **-custom_dtvar_folder** | str  | None                        | Path to folder containing all `_variance.txt`|
-|                       |         |                             | files if not in BIDS structure.             |
-+-----------------------+---------+-----------------------------+--------------------------------------------+
+**Flags:**
 
----
+- **-out_dir** *(str, default: current directory)*  
+  - Output directory for BICEPS results.  
+  - **Remember to bind this path** if using Singularity.
+
+- **-save_bids** *(int, default: 0)*  
+  - Save results in **BIDS format** in addition to standard BICEPS outputs.
+
+- **-attempt_pconn** *(int, default: 0)*  
+  - Generate `.pconn.nii` files from connectivity matrices.  
+  - Automatically activates `-save_bids`.
+
+- **-save_timeseries** *(int, default: 0)*  
+  - Save parcellated timeseries to the standard output format (not BIDS).
+
+- **-fd** *(float, default: 0.2)*  
+  - Framewise displacement threshold in millimeters.
+
+- **-n_skip_vols** *(int, default: 5)*  
+  - Number of frames to skip at the **start of each scan**.  
+  - For concatenated runs, only the **first run** is affected.
+
+- **-minutes** *(float, default: 8)*  
+  - Minimum usable data per subject in minutes.  
+  - **Warning:** There is a known bug in some versions that prevents changing this from 8.
+
+- **-outlier** *(int, default: 1)*  
+  - Remove high-variance frames using a **3× MAD rule**.  
+  - Set to 0 to disable removal (files are still required).
+
+- **-validate_frame_counts** *(int, default: 0)*  
+  - Validate that all runs have the **same number of frames** before processing.
+
+- **-wb_command_path** *(str, default: auto-detected)*  
+  - Path to the HCP `wb_command` binary.  
+  - Use this if `wb_command` is not on your system PATH or you need a custom location.
+
+- **-make_dense_conns** *(int, default: 0)*  
+  - Generate `.dconn.nii` from `.dtseries.nii`.  
+  - Requires matching `.ptseries.nii` files.  
+  - Automatically activates `-save_bids`.
+
+- **-dtseries_smoothing** *(float, default: 0)*  
+  - Gaussian smoothing kernel (sigma, in mm) applied for dense matrices.  
+  - Only used if `-make_dense_conns` is enabled.
+
+- **-left_hem_surface** *(str, default: internal template)*  
+  - Path to **left hemisphere midthickness surface** for smoothing.  
+  - Use subject-specific surfaces for accurate smoothing.  
+  - If provided, you can only process **one subject at a time**.
+
+- **-right_hem_surface** *(str, default: internal template)*  
+  - Same as `-left_hem_surface` but for the **right hemisphere**.
+
+- **-custom_dtvar_folder** *(str, default: None)*  
+  - Path to a folder containing all `_variance.txt` files in a **flat (non-BIDS) layout**.  
+  - Used when variance files are stored outside the session folders.
 
 **Tips and Notes:**
 
@@ -678,28 +681,35 @@ Standard Formatting
 
 ---
 
-### Standard Output Files
 
-+----------------------------+--------------------------------------------------------------+
-| File                       | Description                                                  |
-+============================+==============================================================+
-| frame_removal_mask.mat     | Cell array `<n,3>` where `n` = sessions that met requirements |
-|                            | Columns = temporal masks:                                    |
-|                            | 1. MaxIndividual, 2. MaxGroup, 3. MinGroup                   |
-|                            | 1 = included frame, 0 = excluded                             |
-+----------------------------+--------------------------------------------------------------+
-| fconn_all_surv_frames.mat  | 3D array `<m,m,n>` per parcellation                          |
-|                            | m = # ROIs, n = # sessions                                   |
-|                            | Uses frames from **column 1** of mask (MaxIndividual)         |
-+----------------------------+--------------------------------------------------------------+
-| fconn_<X>_frames.mat       | Same shape `<m,m,n>`; X = # frames (MaxGroup / MinGroup)      |
-+----------------------------+--------------------------------------------------------------+
-| raw_timecourses.mat        | Only if `-save_timeseries 1`                                 |
-|                            | Variable `raw_tc`: `<n,1>` cell array                        |
-|                            | Each cell = `<m,p>` (ROIs × frames)                          |
-+----------------------------+--------------------------------------------------------------+
+Standard Output Files
+---------------------
 
----
+- **frame_removal_mask.mat**  
+  - Cell array `<n,3>` where `n` = number of sessions that met requirements.  
+  - Columns correspond to temporal masks:  
+    1. **MaxIndividual**  
+    2. **MaxGroup**  
+    3. **MinGroup**  
+  - Value `1` = included frame, `0` = excluded frame.
+
+- **fconn_all_surv_frames.mat**  
+  - 3D array `<m,m,n>` per parcellation  
+    - `m` = number of ROIs  
+    - `n` = number of sessions  
+  - Uses frames from **column 1** of `frame_removal_mask.mat` (MaxIndividual mask).
+
+- **fconn_<X>_frames.mat**  
+  - Same 3D shape `<m,m,n>` as above.  
+  - `X` = number of frames used (corresponds to **MaxGroup** or **MinGroup** masks).
+
+- **raw_timecourses.mat** *(only if `-save_timeseries 1`)*  
+  - Contains variable `raw_tc`: `<n,1>` cell array, one per processed session.  
+  - Each cell is a `<m,p>` matrix:  
+    - `m` = number of ROIs in the parcellation  
+    - `p` = number of frames in the scan
+
+
 
 BIDS Formatting
 ----------------
