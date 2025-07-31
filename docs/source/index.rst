@@ -10,453 +10,745 @@ Welcome to biceps_cmdln's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-What is biceps_cmdln?  
-=====================
-biceps_cmdln is a tool for calculating functional connectivity matrices from parcellated timeseries data.  
-The tool is specifically designed for individuals who already have fMRI  
-data that has been (1) denoised, (2) projected into a parcellated cifti space,  
-(3) concatenated [in the case where multiple versions of a run type exist], and (4)  
-formatted using general BIDS Derivatives principles.
+What is biceps_cmdln?
+======================
 
-Note: This pipeline is designed to work seamlessly with data formatted according to conventions used by tools
-developed by the DCAN group at the University of Minnesota, particularly for denoising and parcellation of 
-fMRI data. To ensure optimal compatibility and performance, we recommend using it with data processed through 
-these tools.
+.. note::
 
-biceps_cmdln is specifically designed to calculate functional connectivity  
-matrices for a group of individuals. With this in mind, it is easiest to use  
-the tool once all of the data for your study has been acquired and processed.  
-When you run biceps_cmdln, the tool will first evaluate which subjects and
-sessions have sufficient data for calculating functional connectivity matrices. 
-For each subject and session where there is enough data, each run will have three
-types of functional connectivity matrices that are generated for a given parcellation.
-The remaining three matrices will differ by the number of frames used to generate the 
-underlying matrices. The three types are:
- 
-* MaxIndividual - where all good frames that an individual has will be used to construct connectivity matrix.  
-* MinGroup - where only the minimum requirement for number of frames will be used. For example if 5 min is required and the TR is 2 seconds, only 150 frames (30*5) will be used for each run.
-* MaxGroup - where the maximum number of frames are used that allows for a consistent number of frames across runs. For example if the worst run in the group has 160 frames, then 160 frames will be used as a threshold for all other runs in the study.
+   **Summary:** ``biceps_cmdln`` generates functional connectivity matrices from preprocessed, parcellated fMRI timeseries. 
+   It's optimized for group-level analysis and designed to work with data formatted using DCAN Lab's conventions and BIDS derivatives.
 
-Note: The MaxGroup-type connectivity matrices will only change if different individuals are included in the 
-group, if different imaging data is used, or if the frame selection criteria (e.g., FD thresholds) change. 
-Contrary to what might be inferred, reprocessing the same set of runs with identical parameters should not 
-affect MaxGroup results, since the high-quality frames included are determined consistently across subjects. 
-However, for MinGroup and other individual-level analyses, some variability may occur due to random selection 
-among qualifying frames within a run.
+Overview
+--------
 
-Beyond calculating functional connectivity matrices based on .ptseries.nii files, biceps_cmdln
-can also be used to calculate .dconn.nii files from .dtseries.nii files. Because the file 
-selection algorithm behind biceps_cmdln utilizes .ptseries.nii files to operate, both .ptseries.nii
-files and .dtseries.nii files must be present for every subject if you want to calculate 
-"dense" connectivity matrices. During this procedure the same temporal mask that determines which
-frames will be included/excluded for calculating connectivity matrices from .ptseries.nii files will also
-be applied to the .dtseries.nii file. See "Calculating Dense Connectivity Matrices" section for more
-details.
+``biceps_cmdln`` is a command-line tool for calculating **functional connectivity matrices** from **parcellated fMRI timeseries** data.  
+It is intended for users who already have fMRI data that has been:
+
+1. Denoised  
+2. Projected into a **parcellated CIFTI** space (e.g., `.ptseries.nii`)  
+3. Concatenated (if multiple versions of a run type exist)  
+4. Organized using **BIDS Derivatives** conventions  
+
+.. note::
+
+   ``biceps_cmdln`` is optimized for data preprocessed using tools developed by the **CDNI Lab** at the University of Minnesota.
+   While it may work with other pipelines, we recommend using CDNI-compliant data for best results.
+
+Supported Input Data
+--------------------
+
+The tool is designed for **group-level analysis**, so it works best once your entire dataset has been processed and is ready for analysis.  
+When executed, ``biceps_cmdln`` scans your dataset and identifies subjects and sessions with sufficient usable data for computing functional connectivity.
+
+Connectivity Matrix Types
+-------------------------
+
+For each run with sufficient data, three versions of the functional connectivity matrix are generated per parcellation:
+
++------------------+---------------------------------------------------------------------------------------------------------------------+
+| Matrix Type      | Description                                                                                                         |
++==================+=====================================================================================================================+
+| **MaxIndividual**| Uses **all good frames** available for each individual's run. Maximizes within-subject data usage.                 |
++------------------+---------------------------------------------------------------------------------------------------------------------+
+| **MinGroup**     | Uses a **fixed minimum number of frames** across all individuals. For example, if 5 minutes are needed at TR=2s,    |
+|                  | then 150 frames are used consistently (5 × 60 ÷ 2).                                                                 |
++------------------+---------------------------------------------------------------------------------------------------------------------+
+| **MaxGroup**     | Uses the **maximum number of frames that all runs can share**. For example, if the shortest valid run in the group  |
+|                  | has 160 frames, then all matrices use 160 frames for consistency.                                                   |
++------------------+---------------------------------------------------------------------------------------------------------------------+
+
+.. note::
+
+   The **MaxGroup** matrices only change when:
+   - Different participants are included in the dataset
+   - Different data or runs are selected
+   - The frame selection parameters (e.g., **FD thresholds**) are modified
+
+   Reprocessing the **same data with the same parameters** will not change MaxGroup outputs.  
+   However, **MinGroup** and **MaxIndividual** matrices may show minor variability due to random sampling of eligible frames.
+
+Dense Connectivity Matrix Support
+---------------------------------
+
+In addition to `.ptseries.nii`-based matrices, ``biceps_cmdln`` can compute **dense connectivity matrices** (`.dconn.nii`) from **dense timeseries** data (`.dtseries.nii`).
+
+.. important::
+
+   If you want to generate dense connectivity matrices, **both** `.ptseries.nii` and `.dtseries.nii` files must be present for each subject.  
+   The file selection and frame inclusion are based entirely on the `.ptseries.nii` files.
+
+During this process:
+
+- The **temporal mask** used for `.ptseries.nii`-based matrices is also applied to the `.dtseries.nii` file.
+- This ensures consistency across both parcellated and dense outputs.
+- The resulting `.dconn.nii` matrices represent whole-brain connectivity using only the selected high-quality frames.
+
+For more, see the :ref:`Calculating Dense Connectivity Matrices` section.
+
+---
+
+Acronym Definitions
+-------------------
+
+For clarity:
+
+- **BIDS**: Brain Imaging Data Structure  
+- **TR**: Repetition Time (e.g., 2 seconds between fMRI frames)  
+- **FD**: Framewise Displacement (used to assess motion)
+
 
 Downloading biceps_cmdln
-========================
+=========================
 
-Singularity Container
----------------------
+There are three ways to use ``biceps_cmdln``:
 
-It is recommended that users run biceps_cmdln using the provided Singularity container. 
-This approach ensures that you do not need to have MATLAB or the HCP Connectome Workbench 
-tools installed locally, simplifying setup and enhancing reproducibility. To use this option, 
-you must have Singularity installed on your system.
+1. **Python wrapper** (recommended for most users)
+2. **Singularity container** (easy setup, good for reproducibility)
+3. **MATLAB source code** (for full control and development)
 
-To download the container, go to the
-`DCAN Labs docker hub page <https://hub.docker.com/u/dcanumn>`_ and download the
-most recent version of biceps_cmdln. When building the image on your local machine,
-please ensure that you have 100gb of /tmp space before initiating the build process. If
-you are building biceps_cmdln within a SLURM job at UMN, you can use the following code
-to request appropriate resources: ::
+Running via Python (Recommended)
+--------------------------------
 
-    $ srun -N 1 --ntasks-per-node=1  --tmp=100g --mem-per-cpu=30g -t 5:00:00 -p interactive --pty bash
+The recommended method for most users is the **Python wrapper**, which launches MATLAB behind the scenes while handling:
 
-Then to build the image run: ::
+- Flag validation
+- Output organization
+- Variance patching (if needed)
+- Command-line simplicity
 
-   $ singularity pull docker://dcanumn/biceps_cmdln:1.8
+This approach gives you the **flexibility of MATLAB** without needing to interact with it directly.
 
-The previous command may take up to 3 hours to run and will result in a new .sif file being created
-in your current working directory.
+### Requirements
 
-Note: While the Singularity container version of biceps_cmdln is fully functional and generally recommended, 
-there are known issues affecting certain customization flags, such as --fd and --min. If your analysis 
-relies heavily on these options, please consult the documentation or GitHub issues page for the most 
-up-to-date guidance and potential workarounds.
+- Python 3.6+
+- MATLAB installed
+- `scipy` Python package (`pip install scipy`)
+- Connectome Workbench (or set via `-wb_command_path`)
+- ``biceps_cmdln`` repository and Python wrapper script
+
+### Setup Instructions
+
+1. Clone the repository:  
+   `https://github.com/DCAN-Labs/biceps_cmdln <https://github.com/DCAN-Labs/biceps_cmdln>`_
+
+2. Place the Python wrapper script (`run_biceps.py`) in the root folder.
+
+3. Make it executable: ::
+
+   chmod +x run_biceps.py
+
+4. Run from the command line: ::
+
+   ./run_biceps.py <input_list_or_folder> -out_dir <output_path> [other flags]
+
+**Example:** ::
+
+   ./run_biceps.py subject_list.txt -out_dir results/ -fd 0.2 -minutes 5 -make_dense_conns 1
+
+### Automatic Variance Patching
+
+If your input data is missing required variance files, the wrapper will:
+
+- Detect the issue
+- Trigger a patch step via MATLAB
+- Set the `-custom_dtvar_folder` flag automatically
+
+### Workbench Command Path
+
+If `wb_command` is not in your system's default path, the script will use: ::
+
+   /common/software/install/manual/workbench/2.0.1-rocky8/bin/wb_command
+
+You can override this with the `-wb_command_path` flag.
+
+---
+
+Singularity Container (Portable & Reproducible)
+-----------------------------------------------
+
+Using the provided **Singularity container** is the easiest way to run ``biceps_cmdln`` without needing to install MATLAB or Workbench tools.
+
+Ideal if you:
+
+- Want a portable, reproducible environment
+- Are running on an HPC system with Singularity support
+- Don't need advanced custom flags (e.g., `--fd`, `--min`)
+
+.. note::
+
+   You must have **Singularity** installed on your system to use this option.
+
+### Download and Build the Container
+
+1. Visit the `DCAN Labs Docker Hub page <https://hub.docker.com/u/dcanumn>`_.
+2. Locate the latest version of the container (e.g., `dcanumn/biceps_cmdln:1.8`).
+3. Ensure you have **at least 100 GB** of temporary disk space.
+
+If using SLURM (e.g., at UMN), request build resources: ::
+
+   srun -N 1 --ntasks-per-node=1 --tmp=100g --mem-per-cpu=30g -t 5:00:00 -p interactive --pty bash
+
+Then build the image: ::
+
+   singularity pull docker://dcanumn/biceps_cmdln:1.8
+
+.. warning::
+
+   Building may take up to **3 hours** and will produce a `.sif` file in your working directory.
+
+### Known Limitations
+
+Some customization flags (e.g., ``--fd``, ``--min``) may not behave as expected in the container.  
+If your analysis relies on these, use the Python wrapper or MATLAB version.
+
+---
+
+Running via MATLAB (Full Control)
+---------------------------------
+
+Use this method if you:
+
+- Want access to all internal functions
+- Are developing or debugging the code
+- Need GUI-based functionality
+
+### Setup Instructions
+
+1. Clone the repository:  
+   `https://github.com/DCAN-Labs/biceps_cmdln <https://github.com/DCAN-Labs/biceps_cmdln>`_
+
+2. Ensure you have:
+   - **MATLAB** installed
+   - **Connectome Workbench** installed (``wb_command``)
+
+3. Launch MATLAB and add the path recursively: ::
+
+   addpath(genpath('path/to/biceps_cmdln'))
+
+4. You can now run ``biceps_cmdln`` directly: ::
+
+   biceps_cmdln('input_list.txt', '-out_dir', 'results/', '-fd', 0.2, ...)
+
+### Workbench Path Requirements
+
+.. important::
+
+   If not using the container, ``wb_command`` must be specified correctly.
+
+Options:
+
+- Edit the default inside `biceps_cmdln.m`
+- Use the ``--wb_command_path`` flag at runtime
+
+---
+
+Summary of Usage Options
+-------------------------
+
++--------------------+----------------------------------------------+-----------------------------+
+| Method             | Best For                                     | Requires MATLAB?           |
++====================+==============================================+=============================+
+| Python Wrapper     | Most users, scripting, CLI flags, automation |  Yes (runs behind scenes) |
++--------------------+----------------------------------------------+-----------------------------+
+| Singularity        | Reproducibility, no MATLAB, containers       | L No                       |
++--------------------+----------------------------------------------+-----------------------------+
+| Native MATLAB      | Development, debugging, full customization   |  Yes (interactive)        |
++--------------------+----------------------------------------------+-----------------------------+
 
 
-Github
-------
 
-For users who require full access to all customization options and flags  including features like 
---fd, --min, and GUI mode  the most flexible and robust way to run biceps_cmdln is by cloning the 
-GitHub repository and running it directly in MATLAB.
-
-To do this:
-
-1. Clone the `github repository for biceps_cmdln <https://github.com/DCAN-Labs/biceps_cmdln>`_.
-
-2. Ensure that **MATLAB** and the **HCP Connectome Workbench** tools are installed on your system.
-
-3. Launch MATLAB, navigate to the biceps_cmdln folder, and add all files (recursively) to the MATLAB 
-path. This can be done using::
-
-   $ addpath(genpath('path/to/biceps_cmdln'))
-
-4. You can now run biceps_cmdln like any other MATLAB function, using the same flags described in the 
-documentation and CLI instructions.
-
-**Important:** When running outside of the Singularity container, biceps_cmdln assumes a default path 
-to the Workbench command-line tools (wb_command) that may not match your system. You can either:
-* Edit the default path inside the biceps_cmdln.m function, or
-* Use the --wb_command_path flag to specify the correct path during each run.
-
-While running biceps_cmdln from within a Singularity container is convenient and reduces setup 
-requirements, it may have limitations with certain customization flags. Therefore, we recommend 
-using the native MATLAB version when full functionality or advanced customization is needed.
-
-
-Ways of running biceps_cmdln
+Ways of Running biceps_cmdln
 ============================
 
-Starting biceps_cmdln as GUI application
-----------------------------------------
+``biceps_cmdln`` can be run in several ways, depending on your workflow and system setup.  
+We recommend prioritizing **Python or Singularity-based command-line execution** for reproducibility and automation.  
+The **GUI** remains available for legacy use and visualization.
 
-It is still possible to run biceps as a GUI application, which supports
-legacy application of biceps_cmdln's parent tool "BICEPS". Full documentation
-of the BICEPS GUI can be seen `here <https://gui-environments-documentation.readthedocs.io/en/latest/GUI_environments/>`_.
-Because singularity containers are only able to look at paths that are specified by the user
-at the time the container is ran, it is still necessary to "bind" the input and output directories
-where any data is stored prior to running biceps_cmdln. Also be sure to bind the directory
-containing the file list that will be grabbed to run processing. Binding the directory with
-the file list is required both so that desired file list can be read, and because by default
-the GUI application will save the list of subjects that met processing requirements to the
-same directory where the file list was taken from (note, this is not necessary for command
-line driven processing). In most cases we choose to replace the actual paths to a given folder
-with a shorter/easier to interpret name during the binding process. In this case, the input data
-directory is bound with its original name so that the file list (which points to paths within the
-input directory) will not need to be modified. Note that we also provide the current environmental
-display variable to the container. This is necessary for the GUI windows to be visible on your current
-display. This is only necessary for when you want to use BICEPS in the interactive legacy mode.
-Example: ::
+Available Methods:
+
+1. **Python Wrapper** (Recommended)
+2. **Singularity Container (CLI)**  
+   - Using an input directory  
+   - Using an input directory + making dense dconns  
+   - Using a file list  
+3. **GUI Mode (Legacy)**
+
+---
+
+1. Running via Python Wrapper (Recommended)
+-------------------------------------------
+
+The **Python wrapper** is the simplest and most flexible way to run ``biceps_cmdln``:
+
+- Handles MATLAB calls behind the scenes
+- Automatically checks and patches missing variance files
+- Validates flags and outputs clearer errors
+- Easy to use in scripts or SLURM jobs
+
+Basic usage: ::
+
+    ./run_biceps.py <input_list_or_folder> -out_dir <output_path> [flags]
+
+Example with dense connectivity calculation: ::
+
+    ./run_biceps.py subject_list.txt -out_dir results/ -fd 0.2 -minutes 5 -make_dense_conns 1
+
+See :ref:`Downloading biceps_cmdln` for full Python wrapper instructions.
+
+---
+
+2. Running via Singularity Container (Command Line)
+---------------------------------------------------
+
+The **Singularity container** is portable and requires no local MATLAB installation.  
+You must **bind** the directories for input data, output data, and (if using file lists) the list location.
+
+### 2a. Input Folder with Processed fMRI Data
+
+This is the simplest container usage. You provide a BIDS-derivative style folder of fMRI data: ::
 
     $ input_denoised_dir=/path/to/fmri/processing_output/
-    $ biceps_output_dir=/path/to/directory/for/biceps/output/
-    $ folder_with_file_list=/path/to/folder/containing/file/list/
-    $ container_path=/path/to/biceps/singularity/container.sif
-    $ singularity run --cleanenv \
-        -B /path/to/fmri/processing_output/:/path/to/fmri/processing_output/ \
-        -B $biceps_output_dir:/output \
-        -B $folder_with_file_list:/file_list_dir \
-        --env DISPLAY=$DISPLAY
-        $container_path
-
-Running biceps_cmdln using an input folder with processed fmri data
---------------------------------------------------------------------
-
-The recommended way of running biceps_cmdln is to have a directory of
-processed fMRI data that is formatted roughly as "BIDS Derivatives".
-The exact formatting requirements can be seen later in this document.
-During processing, the user is able to pass an input and output directory,
-and biceps_cmdln will identify which data to process based on organizational
-assumptions. The code to run this is as follows: ::
-
-    $ input_denoised_dir=/path/to/fmri/processing_output/
-    $ biceps_output_dir=/path/to/directory/for/biceps/output/
-    $ container_path=/path/to/biceps/singularity/container.sif
-    $ singularity run --cleanenv \
+    $ biceps_output_dir=/path/to/biceps/output/
+    $ container_path=/path/to/biceps_cmdln.sif
+    
+    singularity run --cleanenv \
         -B $input_denoised_dir:/input \
         -B $biceps_output_dir:/output \
         $container_path /input \
         -out_dir /output
 
-Running biceps_cmdln using an input folder with processed fmri data + making dconns
---------------------------------------------------------------------
+---
 
-If you also want to make dconn images, you will need to set the
-"-make_dense_conns" flag to 1, and bind your home directory to the
-container. Binding your home directory is necessary because some intermediate
-files will get written to this location. Otherwise the syntax is exactly
-the same as what is described in the previous section. After processing you
-will see the dense connectivity files under the general BIDS derivatives formatting
-structure laid out later in this document. Example code: ::
+### 2b. Input Folder + Dense Connectivity Matrices (dconns)
 
-    $ input_denoised_dir=/path/to/fmri/processing_output/
-    $ biceps_output_dir=/path/to/directory/for/biceps/output/
-    $ container_path=/path/to/biceps/singularity/container.sif
+To also generate dense connectivity matrices:
+
+1. Set the ``-make_dense_conns`` flag to 1.
+2. Bind your home directory to allow temporary file writes.
+
+Example: ::
+
     $ singularity run --cleanenv \
         -B $input_denoised_dir:/input \
         -B $biceps_output_dir:/output \
-        -B /home/{insert_group_name}/{insert_user_name}:/home/{insert_group_name}/{insert_user_name} \
+        -B /home/<group>/<user>:/home/<group>/<user> \
         $container_path /input \
         -out_dir /output -make_dense_conns 1
 
+Dense connectivity outputs will appear under the **BIDS derivatives** structure.
 
-Running biceps_cmdln using an input file list pointing to sessions
-------------------------------------------------------------------
+---
 
-If you have a directory with processed fMRI data and you want to
-exclude one or more subjects or sessions from biceps_cmdln processing,
-then you may want to run biceps_cmdln by passing the tool a file list
-instead of a derivative folder. This file list should be a plain text file having 
-one entry per line, where each line points to a session directory that 
-should be included in biceps_cmdln attempts to calculate functional 
-connectivity matrices. 
+### 2c. Input File List
 
-One line of this file is likely to look something like:
-/study_dir/sub-01/ses-01/
+If you want to **restrict processing** to a subset of sessions or subjects, provide a **text file** with one session path per line. Example line: ::
 
-When running processing, you will want to remember to bind
-the input directory where the processed fmri data is stored,
-the output directory where results will be stored, and the path
-to the file list. Importantly, if the binding of the input directory
-changes what the container thinks the paths to the input files are, then
-this difference should be reflected in the file list. So the example
-line listed above might instead need to be something like:
-/input/sub-01/ses-01
+    /study_dir/sub-01/ses-01/
 
-If the input file list refers to data from multiple input directories,
-then be sure to bind each input directory to a unique name in the container.
+.. important::
 
-Example code for base case of using file list to run biceps_cmdln: ::
+   If you bind input directories to a different path (like `/input`),  
+   the paths in your file list **must match the bound paths**: ::
+
+       /input/sub-01/ses-01/
+
+**Base case with file list**: ::
 
     $ input_denoised_dir=/path/to/fmri/processing_output/
-    $ biceps_output_dir=/path/to/directory/for/biceps/output/
+    $ biceps_output_dir=/path/to/biceps/output/
     $ file_list=/path/to/file_list.txt
-    $ container_path=/path/to/biceps/singularity/container.sif
-    $ singularity run --cleanenv \
+    $ container_path=/path/to/biceps_cmdln.sif
+    
+    singularity run --cleanenv \
         -B $input_denoised_dir:/input \
         -B $biceps_output_dir:/output \
         -B $file_list:/file/list.txt \
         $container_path /file/list.txt \
         -out_dir /output
 
+If your list references **multiple input directories**, bind each one to a unique container path.
+
+---
+
+3. Starting biceps_cmdln as GUI (Legacy)
+----------------------------------------
+
+The GUI mode supports **interactive use** and is a legacy feature from the original **BICEPS** tool.  
+Full documentation: `BICEPS GUI Documentation <https://gui-environments-documentation.readthedocs.io/en/latest/GUI_environments/>`_
+
+GUI mode requires:
+
+- A system with **graphical display access** (``DISPLAY`` variable)
+- Proper **binding** of input/output directories and the file list folder
+- Singularity container execution with display forwarding
+
+Example: ::
+
+    $ input_denoised_dir=/path/to/fmri/processing_output/
+    $ biceps_output_dir=/path/to/biceps/output/
+    $ folder_with_file_list=/path/to/file/list/folder/
+    $ container_path=/path/to/biceps_cmdln.sif
+    
+    singularity run --cleanenv \
+        -B $input_denoised_dir:$input_denoised_dir \
+        -B $biceps_output_dir:/output \
+        -B $folder_with_file_list:/file_list_dir \
+        --env DISPLAY=$DISPLAY \
+        $container_path
+
+.. note::
+
+   - GUI is **not required** for CLI processing.
+   - By default, the GUI saves the list of successfully processed subjects to the **same folder** as the input file list.
+
+---
+
+**Summary Recommendation:**
+
+- **Python wrapper** -> Best balance of simplicity and flexibility  
+- **Singularity CLI** -> Most portable and reproducible (HPC-friendly)  
+- **GUI** -> Use only for legacy workflows or interactive visualization
 
 
-Organization requirements for running biceps_cmdln
+Organization Requirements for Running biceps_cmdln
 ==================================================
 
-It is important to remember that all of these requirements need to be satisfied
-for you to be able to use biceps_cmdln. If they are not satisfied, you may consider
-reformatting your data to meet current pipeline requirements or using a different
-pipeline to calculate connectivity matrices.
+``biceps_cmdln`` requires a specific **data organization and file structure** to function properly.  
+If these requirements are not met, you may need to:
 
-1. General BIDS Derivatives structure with session folders.
+- Reformat your data to meet the requirements, **or**
+- Use another pipeline to compute connectivity matrices.
 
-  * For biceps_cmdln to be able to parse files correctly there needs
-    to first be a BIDS Derivatives-like study folder. This study folder
-    should contain different subject folders. Below each subject folder
-    it is required for there to be session folders and then func folders
-    containing denoised fMRI data. While it is generally BIDS acceptable
-    for data to be organized either with or without a session structure,
-    biceps_cmdln requires there to be a session structure. An example of
-    the file structure for a given subject and session may look like:  
+Below are the required components:
 
-    /study_dir/sub-01/ses-01/func/
+---
 
-2. ptseries.nii files for each subject/session.
+1. General BIDS Derivatives Structure with Session Folders
+----------------------------------------------------------
 
-  * Each session and subject that will be processed should have at least one
-    file with extension "ptseries.nii". The ptseries file must have a key-value
-    pair such as "*_roi-Gordon2014FreeSurferSubcortical_*" in the name. The
-    underscores, roi key, and dash will let biceps_cmdln figure out which
-    parcellations are available in the input dataset. For each parcellation scheme
-    biceps_cmdln will calculate a set of connectivity matrices.
+``biceps_cmdln`` expects your fMRI data to be organized in a **BIDS Derivatives-like** hierarchy with:
 
-3. Files with signal variance information.
+- **Study folder**  contains subject folders
+- **Subject folder**  contains session folders
+- **Session folder**  contains `func` folder with denoised fMRI outputs
 
-  * For every concatenated run that is to be processed, the user should have a file
-    with naming ending in "_variance.txt", where the beginning of the file name has
-    the subject and session name, along with the task identifier (i.e. task-rest).
-    There should be one entry at each row referring to the signal's ________. This file
-    will be screened for frames that are more than 3 scaled median absolute deviations
-    from the sample median. If the "_variance.txt" files can not be found within the
-    subject/session/func folders, the user can provide a new folder that solely contains
-    these files (one for each run to be processed) at the base level of the directory. 
-    This directory can be passed to biceps_cmdln via the custom_dtvar_folder
-    argument. Note - even if the user does not want to remove outliers (i.e. if outlier
-    flag is given a value of 0), these "_variance.txt" files must still be provided
-    during processing.
+**Important:** Unlike standard BIDS, ``biceps_cmdln`` **requires** a session structure  
+(`ses-xx`) even if you only have a single session per subject.
 
-4. A biceps_cmdln compatible file with motion and TR information.
+**Example folder structure:** ::
 
-  * For every concatenated run that is to be processed, the user should have a file
-    with naming ending in "_mask.mat", where the beginning of the file name has
-    the subject and session name, along with the task identifier (i.e. task-rest).
-    This file should be a matlab compatible object that has information about which
-    frames are high moton and also what the TR is of the scan. 
+    /study_dir/
+        sub-01/
+            ses-01/
+                func/
+                    <fMRI output files>
+
+---
+
+2. Parcellated Timeseries Files (`.ptseries.nii`)
+-------------------------------------------------
+
+Each **subject/session** must have at least one **CIFTI parcellated timeseries file**:
+
+- File extension: `.ptseries.nii`
+- File name should contain a **parcellation key**, such as: ::
+
+    sub-01_ses-01_task-rest_roi-Gordon2014FreeSurferSubcortical_ptseries.nii
+
+``biceps_cmdln`` uses this key (the `roi-<parcellation>` portion) to:
+
+- Detect available parcellation schemes
+- Generate connectivity matrices for **each parcellation**
+
+---
+
+3. Signal Variance Files (`_variance.txt`)
+------------------------------------------
+
+Each **concatenated run** requires a corresponding **variance file**:
+
+- File extension: `_variance.txt`
+- Filename should start with **subject, session, and task identifiers**, for example: ::
+
+    sub-01_ses-01_task-rest_variance.txt
+
+- Each row contains a **signal variance value per frame**
+
+**Purpose in biceps_cmdln:**
+
+- Frames exceeding **3 scaled median absolute deviations** are considered **outliers**
+- Even if **outlier removal is disabled** (`-outlier 0`),  
+  the `_variance.txt` files **must still exist**
+
+**If `_variance.txt` files are stored elsewhere:**
+
+- Place all variance files in a single folder
+- Pass this folder to ``biceps_cmdln`` using the ``-custom_dtvar_folder`` flag
+
+---
+
+4. Motion and TR Information (`_mask.mat`)
+------------------------------------------
+
+Each run also requires a **MATLAB `.mat` file** containing:
+
+- **Framewise motion mask** (which frames are high-motion)
+- **Repetition Time (TR)** of the scan
+
+File naming convention: ::
+
+    sub-01_ses-01_task-rest_mask.mat
+
+This file is used by ``biceps_cmdln`` to:
+
+- Apply temporal masks
+- Correctly compute frame counts and frame-based thresholds
+
+---
+
+**Summary of Required Files per Run**
+-------------------------------------
+
++----------------------+-------------------------------+-------------------------------------------+
+| File Type            | Extension                     | Purpose                                   |
++======================+===============================+===========================================+
+| Parcellated Timeseries | `.ptseries.nii`               | Main input for connectivity calculation   |
++----------------------+-------------------------------+-------------------------------------------+
+| Signal Variance       | `_variance.txt`                | Detect frame-level outliers               |
++----------------------+-------------------------------+-------------------------------------------+
+| Motion + TR Info      | `_mask.mat`                    | Identify high-motion frames and TR        |
++----------------------+-------------------------------+-------------------------------------------+
+
+.. note::
+
+   If any required files are missing, ``biceps_cmdln`` will fail to process that run.  
+   The **Python wrapper** can assist by **detecting and patching missing variance files** automatically.
+
+---
+
 
 Arguments
 =========
 
-| **Positional:**
-|
-| **input** - if not provided, biceps_cmdln will open to the GUI. If provided this can either be a file list or path to a study directory that should be parsed.
-|
-|
-| **Flag Key/Value Pairs:**
-|
-| Each of the following arguments are formatted as key/value pairs where the flag should always be followed a value describing what action should be applied with the given flag.
-|
-| **-out_dir**: string. Path to where BICEPS output should be stored. Default option is in current working directory. Remember to bind this path if using the singularity version of the tool.    
-|
-| **-save_bids**: int. Set to a positive number if you want the output to be saved in BIDS on top of standard BICEPS output format. Default is to not save in this way.  
-|
-| **-attempt_pconn**: int. Set to positive value if you want BICEPS to try making .pconn.nii files out of the generated connectivity matrices. Default = 0. By activating this argument, -save_bids will also be activated.   
-|
-| **-save_timeseries**: int. Set to positive value if you want to save the timeseries. The saved timeseries will only be propogated to the outputs with standard formatting, not the BIDS formatted outputs. 
-|
-| **-fd**: float. The framewise displacement threshold in mm, default value 0.2.
-|
-| **-n_skip_vols**: int. The number of frames to skip at the beginning of every scan. Default is 5. Remember - if you are working with concatenated runs, this will only remove frames from the first run in the concatenated series.   
-|
-| **-minutes**: float. WARNING. There is a suspected bug in this flag. With that in mind it is likely that the default time of 8 minutes can not be changed at the moment. Intended functioning: The minimum amount of data a subject must have to be included in processing, measured in minutes. Default value = 8 min. To convert frames to time, the tool will extract TR from input metadata (file ending in "_mast.mat").
-|
-| **-outlier**: int. Set to positive value if you want to remove outliers based on signal variability, default 1.  
-|
-| **-validate_frame_counts**: int. Set to a positive value if you want to validate that all runs have the same number of frames. Defaults to 0.
-|
-| **-wb_command_path**: string. Set the path to wb_command from HCP. By default BICEPS will try to find this path on its own.  
-|
-| **-make_dense_conns**: int. Set to positive number to make dconn files from dtseries. Note - you must have corresponding ptseries files for this to work. The output dconn files will have the same temporal masking as the pconn files. By activating this argument, -save_bids will also be activated.   
-|
-| **-dtseries_smoothing**: float. The amount of smoothing to use, for both surface and volume space, in millimeters (sigma of gaussian kernel). This only is used if -make_dense_conns flag is activated.  
-|
-| **-left_hem_surface**: string. The path to the left hemisphere to use for smoothing. If -dtseries_smoothing > 0 and no input is provided here, smoothing will use the default fslr midthicknes file stored in BICEPS. It is better for this to point to the actual midthickness file for a given subject. If that is the case, processing can only occur one subject at a time since it is only possible to give inputs for one surface.  
-|
-| **-right_hem_surface**: string. The path to the right hemisphere to use for smoothing. See description from left_hem_surface for more info.  
-|
-| **-custom_dtvar_folder**: string. If flag is used BICEPS will accept the path to a folder where all dtvariance files are found directly within the folder specified (i.e. NOT BIDS organized)  
-|
+``biceps_cmdln`` can be run with **one positional argument** (input)  
+followed by **optional key/value flags** for customization.
+
+---
+
+Positional Argument
+-------------------
+
++---------+------------------------------------------------------------+
+| Argument | Description                                                |
++=========+============================================================+
+| input   | **Optional.** If omitted, ``biceps_cmdln`` launches the GUI.|
+|         | If provided, can be:                                        |
+|         |                                                            |
+|         | 1. **Path to a study directory** (BIDS-derivatives format)  |
+|         | 2. **Path to a file list** with session directories (one    |
+|         |    per line)                                                |
++---------+------------------------------------------------------------+
+
+---
+
+Optional Key/Value Flags
+------------------------
+
+Each flag is formatted as: ::
+
+    -flag_name <value>
+
+The table below summarizes available flags:
+
++-----------------------+---------+-----------------------------+--------------------------------------------+
+| Flag                  | Type    | Default                     | Description                                |
++=======================+=========+=============================+============================================+
+| **-out_dir**          | str     | `.` (current dir)           | Output directory for BICEPS results. **Bind |
+|                       |         |                             | this path** if using Singularity.           |
++-----------------------+---------+-----------------------------+--------------------------------------------+
+| **-save_bids**        | int     | 0                           | Save results in **BIDS format** in addition |
+|                       |         |                             | to standard BICEPS output.                  |
++-----------------------+---------+-----------------------------+--------------------------------------------+
+| **-attempt_pconn**    | int     | 0                           | Generate `.pconn.nii` files from matrices.  |
+|                       |         |                             | Also activates `-save_bids`.                |
++-----------------------+---------+-----------------------------+--------------------------------------------+
+| **-save_timeseries**  | int     | 0                           | Save parcellated timeseries to standard     |
+|                       |         |                             | outputs (not BIDS).                         |
++-----------------------+---------+-----------------------------+--------------------------------------------+
+| **-fd**               | float   | 0.2                         | Framewise displacement threshold (mm).      |
++-----------------------+---------+-----------------------------+--------------------------------------------+
+| **-n_skip_vols**      | int     | 5                           | Frames to skip at **start of each scan**.   |
+|                       |         |                             | For concatenated runs, only the **first**   |
+|                       |         |                             | run is affected.                            |
++-----------------------+---------+-----------------------------+--------------------------------------------+
+| **-minutes**          | float   | 8                           | **Min usable data per subject (minutes).**  |
+|                       |         |                             | **Warning:** Known bug prevents changing    |
+|                       |         |                             | this from default in some versions.         |
++-----------------------+---------+-----------------------------+--------------------------------------------+
+| **-outlier**          | int     | 1                           | Remove high-variance frames (3 MAD rule).   |
+|                       |         |                             | Set to 0 to disable removal (files still    |
+|                       |         |                             | required).                                  |
++-----------------------+---------+-----------------------------+--------------------------------------------+
+| **-validate_frame_counts** | int | 0                           | Check that all runs have **same frame count**|
+|                       |         |                             | before processing.                          |
++-----------------------+---------+-----------------------------+--------------------------------------------+
+| **-wb_command_path**  | str     | Auto-detected               | Path to HCP ``wb_command`` binary. Use this |
+|                       |         |                             | if not on PATH or using custom Workbench.   |
++-----------------------+---------+-----------------------------+--------------------------------------------+
+| **-make_dense_conns** | int     | 0                           | Generate `.dconn.nii` from `.dtseries.nii`. |
+|                       |         |                             | Requires matching `.ptseries.nii` files.    |
+|                       |         |                             | Activates `-save_bids`.                     |
++-----------------------+---------+-----------------------------+--------------------------------------------+
+| **-dtseries_smoothing** | float | 0                           | Gaussian smoothing (mm, sigma) for dense    |
+|                       |         |                             | matrices. Only used if `-make_dense_conns`. |
++-----------------------+---------+-----------------------------+--------------------------------------------+
+| **-left_hem_surface** | str     | Internal default            | Path to subject-specific **L midthickness** |
+|                       |         |                             | surface for smoothing. Required for         |
+|                       |         |                             | subject-specific smoothing; else defaults   |
+|                       |         |                             | to fslr template.                           |
++-----------------------+---------+-----------------------------+--------------------------------------------+
+| **-right_hem_surface**| str     | Internal default            | Same as above, but for **R hemisphere**.    |
++-----------------------+---------+-----------------------------+--------------------------------------------+
+| **-custom_dtvar_folder** | str  | None                        | Path to folder containing all `_variance.txt`|
+|                       |         |                             | files if not in BIDS structure.             |
++-----------------------+---------+-----------------------------+--------------------------------------------+
+
+---
+
+**Tips and Notes:**
+
+- Any **positive integer value** is treated as "True" for boolean flags.  
+- Flags like `-attempt_pconn` and `-make_dense_conns` **automatically enable `-save_bids`**.  
+- Even with `-outlier 0`, variance files (`_variance.txt`) **must exist**.  
+- Using `-minutes` < 8 may require fixing the known bug in some versions.  
+
+---
 
 
 Expected Outputs
 ================
 
+After running ``biceps_cmdln``, outputs are organized under the directory specified by ``-out_dir``.  
+Two main formats are produced:
+
+1. **Standard formatting** (always created)
+2. **BIDS formatting** (if `-save_bids` or certain flags are used)
+
+---
+
 Standard Formatting
 -------------------
 
-biceps_cmdln will produce two output directories within the parent output directory.
-The first directory will be under the user specified output directory and named "standard".
-Under "standard" will be a folder named "Functional" and underneath that will be a folder
-whose name varies based on the settings used to run biceps_cmdln. Underneath that folder
-will be one folder for each parcellation present in the input dataset. The overall contents
-of this "standard" folder will look something like:
+``biceps_cmdln`` will always generate a **standard/** folder inside the output directory.
 
-- ── Functional
-    - ── list_with_variance_MCMethod_power_2014_FD_only_FD_th_0_20_min_frames_600_skip_frames_5_TRseconds_0_80
-        - ── frame_removal_mask.mat
-        - ── Gordon2014FreeSurferSubcortical_timeseries.ptseries
-            - ── fconn_600_frames.mat
-            - ── fconn_820_frames.mat
-            - ── fconn_all_surv_frames.mat
-            - ── raw_timecourses.mat
-        - ── HCP2016FreeSurferSubcortical_timeseries.ptseries
-            - ── fconn_600_frames.mat
-            - ── fconn_820_frames.mat
-            - ── fconn_all_surv_frames.mat
-            - ── raw_timecourses.mat
+**Example directory tree:**
 
-In the example above, we see how the folder below "Functional" contains infomation relevant
-to the current processing, such as the minimum frames requirement, the TR, and the FD threshold.
+.. code-block:: text
 
-In addition to these files there will be file list of subjects that were included in processing. This
-file will generally be directly under the output directory (meaning adjacent to "standard"), and have
-one line for each subject that was included in processing. Additionally if the user provided biceps_cmdln
-with a folder to process instead of a file list, there will be a file named "biceps_file_list.txt" that
-displays all the subjects/sessions that were candidates for processing. The difference between the two
-file lists is that the first list excludes subjects that didn't have the prerequisite number of frames
-for processing. The exception to this file layout is if the GUI form of biceps_cmdln was used to initiate
-processing. In the case the GUI is used, the copy of the list describing which files were used in
-processing will instead be found in the same directory as the file list that was selected by the
-GUI at the beginning of processing.
+    output_dir/
+    +-- standard/
+        +-- Functional/
+            +-- list_with_variance_MCMethod_power_2014_FD_only_FD_th_0_20_min_frames_600_skip_frames_5_TRseconds_0_80/
+                +-- frame_removal_mask.mat
+                +-- Gordon2014FreeSurferSubcortical_timeseries.ptseries/
+                |   +-- fconn_600_frames.mat
+                |   +-- fconn_820_frames.mat
+                |   +-- fconn_all_surv_frames.mat
+                |   +-- raw_timecourses.mat
+                +-- HCP2016FreeSurferSubcortical_timeseries.ptseries/
+                    +-- fconn_600_frames.mat
+                    +-- fconn_820_frames.mat
+                    +-- fconn_all_surv_frames.mat
+                    +-- raw_timecourses.mat
+    +-- included_subjects.txt
+    +-- biceps_file_list.txt
 
-The files outlined in the chart above will have the following structure. For all instances
-where there are "n" dimensions representing some number of subjects/sessions that were included
-in processing, the ordering of those n subjects will be the same as listed in the output file
-list described in the last paragraph.
-|
-* frame_removal_mask.mat: This is a matlab file with variable "mask" representing a cell array
-  with shape <n,3> where n is the number of sessions that had runs meeting the minimum
-  processing requirements, and 3 represents the different temporal masking options
-  (MaxIndividual, MaxGroup, then MinGroup, respectively). Mask values are 1 for included
-  frames and 0 for excluded frames.
-* fconn_all_surv_frames.mat: A matlab file with variable "fconn". fconn is a three dimensional
-  array with shape <m,m,n> where m is the number of regions in the parcellation and n is the
-  number of of subjects. The frames used to create these connectivity matrices is found in
-  the <:,1>th entries of the frame_removal_mask file. There will be one of these files generated
-  for each parcellation that was used during processing.
-* fconn_820_frames.mat: Same structure as fconn_all_surv_frames.mat. Now the mask entries
-  used to generate these matrices can be found in the <:,2>th entries. The exact name of
-  this type of file will change based on your dataset. This file represents the "MaxGroup"
-  type of frame sampling.
-* fconn_600_frames.mat: Same structure as fconn_all_surv_frames.mat. Now the mask entries
-  used to generate these matrices can be found in the <:,3>th entries. The exact name of
-  this type of file will change based on your dataset. This file represents the "MinGroup"
-  type of frame sampling.
-* raw_timecourses.mat: This file will only be created when the save_timeseries flag is set
-  to 1. If generated, the matlab file will have one variable named raw_tc. raw_tc will be 
-  a <n,1> cell array for n subjects that were processed. Each cell array element represents
-  a <m,p> matrix where m is the number of regions in a parcellation and p is the number of
-  frames in the scan.
+**Key Points:**
 
+- The folder under **Functional/** encodes run settings:
+  - FD threshold
+  - Minimum frames required
+  - TR and skip frames
+- **`included_subjects.txt`** -> sessions that met frame requirements
+- **`biceps_file_list.txt`** -> all candidate sessions (if input was a folder)
 
-BIDS formatting
----------------
+.. note::
+   If you launch processing via the **GUI**, the list of included subjects  
+   is saved next to the **input file list** you selected, not in the output folder.
 
-If the option save_bids is enabled during processing, there will also be a "bids" folder that
-will be made under the output directory adjacent to the "standard" directory described in the
-last section. Under the "bids" folder will be subject, session, and func folders, followed by
-specific files for a given session that were generated during processing. An example of a
-subject folder structure under "bids" is seen below. For each parcellation there will be files
-for the three different frame sampling schemes, and at minimum .mat and .json files containing the
-underlying connectivity data and the settings used to generate those connectivity estimates, respectively.
-If the setting "-attempt_pconn" is enabled, biceps_cmdln will also attempt to create files with a similar
-name ending ".pconn.nii" that can be used to visualize connectivity data within HCP workbench tools.
+---
 
-All the .mat files will contain an "ind_fconn" variable that is <m,m>, where m is the number
-of regions in the parcellation. 
+### Standard Output Files
 
-The json files corresponding to a given .mat file will have metadata including the subject/session info,
-the frames used during processing, the total number of included and excluded frames, along with processing
-details like the framewise displacement threshold, and number of skip volumes applied at the beginning of
-the scan.
++----------------------------+--------------------------------------------------------------+
+| File                       | Description                                                  |
++============================+==============================================================+
+| frame_removal_mask.mat     | Cell array `<n,3>` where `n` = sessions that met requirements |
+|                            | Columns = temporal masks:                                    |
+|                            | 1. MaxIndividual, 2. MaxGroup, 3. MinGroup                   |
+|                            | 1 = included frame, 0 = excluded                             |
++----------------------------+--------------------------------------------------------------+
+| fconn_all_surv_frames.mat  | 3D array `<m,m,n>` per parcellation                          |
+|                            | m = # ROIs, n = # sessions                                   |
+|                            | Uses frames from **column 1** of mask (MaxIndividual)         |
++----------------------------+--------------------------------------------------------------+
+| fconn_<X>_frames.mat       | Same shape `<m,m,n>`; X = # frames (MaxGroup / MinGroup)      |
++----------------------------+--------------------------------------------------------------+
+| raw_timecourses.mat        | Only if `-save_timeseries 1`                                 |
+|                            | Variable `raw_tc`: `<n,1>` cell array                        |
+|                            | Each cell = `<m,p>` (ROIs × frames)                          |
++----------------------------+--------------------------------------------------------------+
 
-Finally if the "-make_dense_conns" argument is enabled, scrubbed timeseries files ending in ".dtseries.nii"
-and connectivity matrices ending in ".dconn.nii" will be created. If a smoothing kernel is specified during processing
-the level of smoothing will be reflected in the name of both dense cifti files. Because all arguments/frames used for
-processing the parcellated connectivity matrices will be propogated to the processing of the dense files, the json files
-created for the parcellated connectivity matrices can be used to view the processing settings that were used for
-constructing the dense files.
+---
 
-- ── sub-01
-    - ──  ses-01
-        - ──  func
-            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.json
-            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.mat
-            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.pconn.nii
-            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.json
-            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.mat
-            - ── sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.pconn.nii
-            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.json
-            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.mat
-            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.pconn.nii
-            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.json
-            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.mat
-            - ── sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.pconn.nii
-            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.json
-            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.mat
-            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.pconn.nii
-            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.json
-            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.mat
-            - ── sub-01_ses-01_task-rest_frames-MinGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.pconn.nii
-            - ── sub-01_ses-01_task-rest_smoothing-15mm_frames-MaxGroup_bold_timeseries.dtseries.nii
-            - ── sub-01_ses-01_task-rest_smoothing-15mm_frames-MaxGroup_bold_timeseries_desc-conn.dconn.nii
-            - ── sub-01_ses-01_task-rest_smoothing-15mm_frames-MaxIndividual_bold_timeseries.dtseries.nii
-            - ── sub-01_ses-01_task-rest_smoothing-15mm_frames-MaxIndividual_bold_timeseries_desc-conn.dconn.nii
-            - ── sub-01_ses-01_task-rest_smoothing-15mm_frames-MinGroup_bold_timeseries.dtseries.nii
-            - ── sub-01_ses-01_task-rest_smoothing-15mm_frames-MinGroup_bold_timeseries_desc-conn.dconn.nii
+BIDS Formatting
+----------------
+
+If **`-save_bids`**, **`-attempt_pconn`**, or **`-make_dense_conns`** are used,  
+a **bids/** folder is also created next to **standard/**.
+
+**Example per-subject structure:**
+
+.. code-block:: text
+
+    output_dir/
+    +-- standard/
+    +-- bids/
+        +-- sub-01/
+            +-- ses-01/
+                +-- func/
+                    +-- sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.json
+                    +-- sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.mat
+                    +-- sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.pconn.nii
+                    +-- sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.json
+                    +-- sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.mat
+                    +-- sub-01_ses-01_task-rest_frames-MaxGroup_bold_roi-HCP2016FreeSurferSubcortical_timeseries_desc-conn.pconn.nii
+                    +-- sub-01_ses-01_task-rest_frames-MaxIndividual_bold_roi-Gordon2014FreeSurferSubcortical_timeseries_desc-conn.json
+                    +-- ...
+                    +-- sub-01_ses-01_task-rest_smoothing-15mm_frames-MaxGroup_bold_timeseries.dtseries.nii
+                    +-- sub-01_ses-01_task-rest_smoothing-15mm_frames-MaxGroup_bold_timeseries_desc-conn.dconn.nii
+
+---
+
+### BIDS Output File Types
+
+- **`.mat`** -> `ind_fconn` (<m,m>), single-session connectivity matrix
+- **`.json`** -> metadata (subject, session, frames used, FD threshold, skip volumes)
+- **`.pconn.nii`** -> parcellated connectivity, viewable in Connectome Workbench
+- **`.dtseries.nii` / `.dconn.nii`** -> dense outputs (if `-make_dense_conns 1`)
+
+.. note::
+   Dense connectivity outputs are processed using the **same temporal mask**  
+   and **settings** as the parcellated matrices.  
+   The `.json` files from the parcellated outputs describe the parameters used.
+
+---
+
+**Summary:**
+
+- **Standard output** = group-level `.mat` files per parcellation and frame-sampling scheme  
+- **BIDS output** = per-session `.mat` + `.json` (and optional `.pconn.nii` / `.dconn.nii`)  
+- **Dense outputs** mirror the parcellated processing and appear only if requested
 
 
 Troubleshooting
