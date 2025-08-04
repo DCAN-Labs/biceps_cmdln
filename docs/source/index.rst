@@ -1,5 +1,5 @@
 .. biceps_cmdln documentation master file, created by
-   sphinx-quickstart on Thu Jan  4 15:10:00 2024.
+   Kody DeGolier on Mon Aug  8 15:10:00 2024.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
@@ -138,15 +138,15 @@ Setup Instructions
 
 3. Make it executable: ::
 
-   chmod +x run_biceps.py
+    chmod +x run_biceps.py
 
 4. Run from the command line: ::
 
-   ./run_biceps.py <input_list_or_folder> -out_dir <output_path> [other flags]
+    ./run_biceps.py <input_list_or_folder> -out_dir <output_path> [other flags]
 
 **Example:** ::
 
-   ./run_biceps.py subject_list.txt -out_dir results/ -fd 0.2 -minutes 5 -make_dense_conns 1
+    ./run_biceps.py subject_list.txt -out_dir results/ -fd 0.2 -minutes 5 -make_dense_conns 1
 
 Automatic Variance Patching
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -166,7 +166,7 @@ If `wb_command` is not in your system's default path, the script will use: ::
 
 You can override this with the `-wb_command_path` flag.
 
----
+
 
 Singularity Container (Portable & Reproducible)
 -----------------------------------------------
@@ -231,11 +231,11 @@ Setup Instructions
 
 3. Launch MATLAB and add the path recursively: ::
 
-   addpath(genpath('path/to/biceps_cmdln'))
+    addpath(genpath('path/to/biceps_cmdln'))
 
 4. You can now run ``biceps_cmdln`` directly: ::
 
-   biceps_cmdln('input_list.txt', '-out_dir', 'results/', '-fd', 0.2, ...)
+    biceps_cmdln('input_list.txt', '-out_dir', 'results/', '-fd', 0.2, ...)
 
 Workbench Path Requirements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -641,7 +641,7 @@ The table below summarizes available flags:
 .. _calculating_dense_connectivity_matrices:
 
 Calculating Dense Connectivity Matrices
-----------------------------------------
+=======================================
 
 Dense connectivity matrices store vertex- or voxel-wise correlations across the brain, rather than parcel-averaged values.  
 They are much larger than parcellated matrices but preserve the full spatial resolution of the input data.
