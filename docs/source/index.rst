@@ -578,7 +578,7 @@ Here are some example commands to get started quickly:
 
 **Description:**
 
-- If **omitted**  launches the GUI.
+- If **omitted** -> launches the GUI.
 - If **provided**, ``input`` can be:
 
   1. **Path to a study directory** (BIDS-derivatives format)
