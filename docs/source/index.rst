@@ -314,8 +314,8 @@ See :ref:`Downloading biceps_cmdln` for full Python wrapper instructions.
 The **Singularity container** is portable and requires no local MATLAB installation.  
 You must **bind** the directories for input data, output data, and (if using file lists) the list location.
 
-2a. Input Folder with Processed fMRI Data
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Input Folder with Processed fMRI Data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is the simplest container usage. You provide a BIDS-derivative style folder of fMRI data: ::
 
@@ -331,8 +331,8 @@ This is the simplest container usage. You provide a BIDS-derivative style folder
 
 
 
-2b. Input Folder + Dense Connectivity Matrices (dconns)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Input Folder + Dense Connectivity Matrices (dconns)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To also generate dense connectivity matrices:
 
@@ -352,8 +352,8 @@ Dense connectivity outputs will appear under the **BIDS derivatives** structure.
 
 
 
-2c. Input File List
-~~~~~~~~~~~~~~~~~~~
+Input File List
+~~~~~~~~~~~~~~~
 
 If you want to **restrict processing** to a subset of sessions or subjects, provide a **text file** with one session path per line. Example line: ::
 
@@ -542,100 +542,150 @@ This file is used by ``biceps_cmdln`` to:
 
 
 
+Command-Line Arguments
+======================
 
-Arguments
-=========
-
-``biceps_cmdln`` can be run with **one positional argument** (input)  
+The ``biceps_cmdln`` tool accepts **one optional positional argument** (the input)
 followed by **optional key/value flags** for customization.
 
+If no arguments are provided, the graphical user interface (GUI) will launch.
+
+Quick Start Examples
+--------------------
+
+Here are some example commands to get started quickly:
+
+.. code-block:: bash
+
+    # Example 1: Run with a study directory, adjust minimum minutes and FD threshold
+    biceps_cmdln /path/to/study -minutes 6 -fd 0.15
+
+    # Example 2: Run with a study directory and use a custom dtvar folder
+    biceps_cmdln /path/to/study -custom_dtvar_folder /path/to/dtvar_files
+
+    # Example 3: Combine all three flags in one run
+    biceps_cmdln /path/to/study -minutes 6 -fd 0.15 -custom_dtvar_folder /path/to/dtvar_files
 
 
-Positional Argument
--------------------
+1. Positional Argument: ``input``
+---------------------------------
 
-- **input** *(optional)*  
-  - If omitted, ``biceps_cmdln`` launches the GUI.  
-  - If provided, it can be one of:  
-    1. **Path to a study directory** (BIDS-derivatives format)  
-    2. **Path to a file list** with session directories (one per line)
+**Usage:**
+
+.. code-block:: bash
+
+    biceps_cmdln [input]
+
+**Description:**
+
+- If **omitted**  launches the GUI.
+- If **provided**, ``input`` can be:
+
+  1. **Path to a study directory** (BIDS-derivatives format)
+  2. **Path to a file list** containing session directories (one path per line)
+
+**Examples:**
+
+.. code-block:: bash
+
+    # Run with a study directory
+    biceps_cmdln /path/to/study
+
+    # Run with a file list
+    biceps_cmdln session_list.txt
 
 
-Optional Key/Value Flags
-------------------------
+2. Optional Flags
+-----------------
 
-Each flag is formatted as: ::
+Flags are provided in the form:
+
+.. code-block:: bash
 
     -flag_name <value>
 
-The table below summarizes available flags:
+Below is a breakdown of available flags.
 
-**Flags:**
+General Output
+~~~~~~~~~~~~~~
 
-- **-out_dir** *(str, default: current directory)*  
-  - Output directory for BICEPS results.  
-  - **Remember to bind this path** if using Singularity.
+- **``-out_dir``** *(str, default: ``.``)*  
+  Output directory for results.  
+  **Tip:** Bind this path if using Singularity.
 
-- **-save_bids** *(int, default: 0)*  
-  - Save results in **BIDS format** in addition to standard BICEPS outputs.
+- **``-save_bids``** *(int, default: ``0``)*  
+  Save results in **BIDS format** in addition to standard outputs.
 
-- **-attempt_pconn** *(int, default: 0)*  
-  - Generate `.pconn.nii` files from connectivity matrices.  
-  - Automatically activates `-save_bids`.
 
-- **-save_timeseries** *(int, default: 0)*  
-  - Save parcellated timeseries to the standard output format (not BIDS).
+Connectivity & Timeseries
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- **-fd** *(float, default: 0.2)*  
-  - Framewise displacement threshold in millimeters.
+- **``-attempt_pconn``** *(int, default: ``0``)*  
+  Generate ``.pconn.nii`` from connectivity matrices.  
+  Automatically enables ``-save_bids``.
 
-- **-n_skip_vols** *(int, default: 5)*  
-  - Number of frames to skip at the **start of each scan**.  
-  - For concatenated runs, only the **first run** is affected.
+- **``-save_timeseries``** *(int, default: ``0``)*  
+  Save parcellated timeseries in the standard (non-BIDS) format.
 
-- **-minutes** *(float, default: 8)*  
-  - Minimum usable data per subject in minutes.  
-  - **Warning:** There is a known bug in some versions that prevents changing this from 8.
 
-- **-outlier** *(int, default: 1)*  
-  - Remove high-variance frames using a **3× MAD rule**.  
-  - Set to 0 to disable removal (files are still required).
+Frame Selection & Motion
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-- **-validate_frame_counts** *(int, default: 0)*  
-  - Validate that all runs have the **same number of frames** before processing.
+- **``-fd``** *(float, default: ``0.2``)*  
+  Framewise displacement threshold in millimeters.
 
-- **-wb_command_path** *(str, default: auto-detected)*  
-  - Path to the HCP `wb_command` binary.  
-  - Use this if `wb_command` is not on your system PATH or you need a custom location.
+- **``-n_skip_vols``** *(int, default: ``5``)*  
+  Number of frames to skip at the start of each scan.  
+  Only affects the **first run** in concatenated runs.
 
-- **-make_dense_conns** *(int, default: 0)*  
-  - Generate `.dconn.nii` from `.dtseries.nii`.  
-  - Requires matching `.ptseries.nii` files.  
-  - Automatically activates `-save_bids`.
+- **``-minutes``** *(float, default: ``8``)*  
+  Minimum usable data per subject (minutes).  
+  **Note:** Some versions have a bug preventing changes from the default.
 
-- **-dtseries_smoothing** *(float, default: 0)*  
-  - Gaussian smoothing kernel (sigma, in mm) applied for dense matrices.  
-  - Only used if `-make_dense_conns` is enabled.
+- **``-outlier``** *(int, default: ``1``)*  
+  Remove high-variance frames (3× MAD rule).  
+  Set to ``0`` to disable removal (variance files still required).
 
-- **-left_hem_surface** *(str, default: internal template)*  
-  - Path to **left hemisphere midthickness surface** for smoothing.  
-  - Use subject-specific surfaces for accurate smoothing.  
-  - If provided, you can only process **one subject at a time**.
+- **``-validate_frame_counts``** *(int, default: ``0``)*  
+  Ensure all runs have the same number of frames before processing.
 
-- **-right_hem_surface** *(str, default: internal template)*  
-  - Same as `-left_hem_surface` but for the **right hemisphere**.
 
-- **-custom_dtvar_folder** *(str, default: None)*  
-  - Path to a folder containing all `_variance.txt` files in a **flat (non-BIDS) layout**.  
-  - Used when variance files are stored outside the session folders.
+Dense Connectivity
+~~~~~~~~~~~~~~~~~~
 
-**Tips and Notes:**
+- **``-make_dense_conns``** *(int, default: ``0``)*  
+  Generate ``.dconn.nii`` from ``.dtseries.nii`` (requires matching ``.ptseries.nii``).  
+  Automatically enables ``-save_bids``.
 
-- Any **positive integer value** is treated as "True" for boolean flags.  
-- Flags like `-attempt_pconn` and `-make_dense_conns` **automatically enable `-save_bids`**.  
-- Even with `-outlier 0`, variance files (`_variance.txt`) **must exist**.  
-- Using `-minutes` < 8 may require fixing the known bug in some versions.  
+- **``-dtseries_smoothing``** *(float, default: ``0``)*  
+  Gaussian smoothing kernel size (sigma, mm) for dense matrices.  
+  Only applies if ``-make_dense_conns`` is set.
 
+- **``-left_hem_surface``** *(str, default: internal template)*  
+  Path to **left hemisphere midthickness surface** for smoothing.  
+  If set, process only **one subject at a time**.
+
+- **``-right_hem_surface``** *(str, default: internal template)*  
+  Same as above, but for the right hemisphere.
+
+
+Custom File Layouts
+~~~~~~~~~~~~~~~~~~~
+
+- **``-wb_command_path``** *(str, default: auto-detected)*  
+  Path to the HCP ``wb_command`` binary if not on PATH or using a custom version.
+
+- **``-custom_dtvar_folder``** *(str, default: None)*  
+  Path to a folder containing ``_variance.txt`` files in a flat (non-BIDS) layout.
+
+
+Notes & Tips
+~~~~~~~~~~~~
+
+- Boolean flags treat **any positive integer** as "true".
+- ``-attempt_pconn`` and ``-make_dense_conns`` **automatically enable** ``-save_bids``.
+- Even with ``-outlier 0``, ``_variance.txt`` files **must exist**.
+- If lowering ``-minutes`` below 8, check for version compatibility due to the known bug.
 
 
 .. _calculating_dense_connectivity_matrices:
