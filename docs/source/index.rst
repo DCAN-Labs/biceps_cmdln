@@ -86,7 +86,7 @@ During this process:
 
 For more, see the :ref:`Calculating Dense Connectivity Matrices` section.
 
----
+
 
 Acronym Definitions
 -------------------
@@ -119,7 +119,8 @@ The recommended method for most users is the **Python wrapper**, which launches 
 
 This approach gives you the **flexibility of MATLAB** without needing to interact with it directly.
 
-### Requirements
+Requirements
+~~~~~~~~~~~~
 
 - Python 3.6+
 - MATLAB installed
@@ -127,7 +128,8 @@ This approach gives you the **flexibility of MATLAB** without needing to interac
 - Connectome Workbench (or set via `-wb_command_path`)
 - ``biceps_cmdln`` repository and Python wrapper script
 
-### Setup Instructions
+Setup Instructions
+~~~~~~~~~~~~~~~~~~
 
 1. Clone the repository:  
    `https://github.com/DCAN-Labs/biceps_cmdln <https://github.com/DCAN-Labs/biceps_cmdln>`_
@@ -146,7 +148,8 @@ This approach gives you the **flexibility of MATLAB** without needing to interac
 
    ./run_biceps.py subject_list.txt -out_dir results/ -fd 0.2 -minutes 5 -make_dense_conns 1
 
-### Automatic Variance Patching
+Automatic Variance Patching
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If your input data is missing required variance files, the wrapper will:
 
@@ -154,7 +157,8 @@ If your input data is missing required variance files, the wrapper will:
 - Trigger a patch step via MATLAB
 - Set the `-custom_dtvar_folder` flag automatically
 
-### Workbench Command Path
+Workbench Command Path
+~~~~~~~~~~~~~~~~~~~~~~
 
 If `wb_command` is not in your system's default path, the script will use: ::
 
@@ -179,7 +183,8 @@ Ideal if you:
 
    You must have **Singularity** installed on your system to use this option.
 
-### Download and Build the Container
+Download and Build the Container
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. Visit the `DCAN Labs Docker Hub page <https://hub.docker.com/u/dcanumn>`_.
 2. Locate the latest version of the container (e.g., `dcanumn/biceps_cmdln:1.8`).
@@ -197,12 +202,13 @@ Then build the image: ::
 
    Building may take up to **3 hours** and will produce a `.sif` file in your working directory.
 
-### Known Limitations
+Known Limitations
+~~~~~~~~~~~~~~~~~
 
 Some customization flags (e.g., ``--fd``, ``--min``) may not behave as expected in the container.  
 If your analysis relies on these, use the Python wrapper or MATLAB version.
 
----
+
 
 Running via MATLAB (Full Control)
 ---------------------------------
@@ -213,7 +219,8 @@ Use this method if you:
 - Are developing or debugging the code
 - Need GUI-based functionality
 
-### Setup Instructions
+Setup Instructions
+~~~~~~~~~~~~~~~~~~
 
 1. Clone the repository:  
    `https://github.com/DCAN-Labs/biceps_cmdln <https://github.com/DCAN-Labs/biceps_cmdln>`_
@@ -230,7 +237,8 @@ Use this method if you:
 
    biceps_cmdln('input_list.txt', '-out_dir', 'results/', '-fd', 0.2, ...)
 
-### Workbench Path Requirements
+Workbench Path Requirements
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. important::
 
@@ -241,7 +249,7 @@ Options:
 - Edit the default inside `biceps_cmdln.m`
 - Use the ``--wb_command_path`` flag at runtime
 
----
+
 
 Summary of Usage Options
 ------------------------
@@ -276,7 +284,7 @@ Available Methods:
    - Using a file list  
 3. **GUI Mode (Legacy)**
 
----
+
 
 1. Running via Python Wrapper (Recommended)
 -------------------------------------------
@@ -298,7 +306,7 @@ Example with dense connectivity calculation: ::
 
 See :ref:`Downloading biceps_cmdln` for full Python wrapper instructions.
 
----
+
 
 2. Running via Singularity Container (Command Line)
 ---------------------------------------------------
@@ -306,7 +314,8 @@ See :ref:`Downloading biceps_cmdln` for full Python wrapper instructions.
 The **Singularity container** is portable and requires no local MATLAB installation.  
 You must **bind** the directories for input data, output data, and (if using file lists) the list location.
 
-### 2a. Input Folder with Processed fMRI Data
+2a. Input Folder with Processed fMRI Data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is the simplest container usage. You provide a BIDS-derivative style folder of fMRI data: ::
 
@@ -320,9 +329,10 @@ This is the simplest container usage. You provide a BIDS-derivative style folder
         $container_path /input \
         -out_dir /output
 
----
 
-### 2b. Input Folder + Dense Connectivity Matrices (dconns)
+
+2b. Input Folder + Dense Connectivity Matrices (dconns)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To also generate dense connectivity matrices:
 
@@ -340,9 +350,10 @@ Example: ::
 
 Dense connectivity outputs will appear under the **BIDS derivatives** structure.
 
----
 
-### 2c. Input File List
+
+2c. Input File List
+~~~~~~~~~~~~~~~~~~~
 
 If you want to **restrict processing** to a subset of sessions or subjects, provide a **text file** with one session path per line. Example line: ::
 
@@ -371,7 +382,7 @@ If you want to **restrict processing** to a subset of sessions or subjects, prov
 
 If your list references **multiple input directories**, bind each one to a unique container path.
 
----
+
 
 3. Starting biceps_cmdln as GUI (Legacy)
 ----------------------------------------
@@ -404,7 +415,7 @@ Example: ::
    - GUI is **not required** for CLI processing.
    - By default, the GUI saves the list of successfully processed subjects to the **same folder** as the input file list.
 
----
+
 
 **Summary Recommendation:**
 
@@ -424,7 +435,7 @@ If these requirements are not met, you may need to:
 
 Below are the required components:
 
----
+
 
 1. General BIDS Derivatives Structure with Session Folders
 ----------------------------------------------------------
@@ -446,7 +457,7 @@ Below are the required components:
                 func/
                     <fMRI output files>
 
----
+
 
 2. Parcellated Timeseries Files (`.ptseries.nii`)
 -------------------------------------------------
@@ -463,7 +474,7 @@ Each **subject/session** must have at least one **CIFTI parcellated timeseries f
 - Detect available parcellation schemes
 - Generate connectivity matrices for **each parcellation**
 
----
+
 
 3. Signal Variance Files (`_variance.txt`)
 ------------------------------------------
@@ -488,7 +499,7 @@ Each **concatenated run** requires a corresponding **variance file**:
 - Place all variance files in a single folder
 - Pass this folder to ``biceps_cmdln`` using the ``-custom_dtvar_folder`` flag
 
----
+
 
 4. Motion and TR Information (`_mask.mat`)
 ------------------------------------------
@@ -507,7 +518,7 @@ This file is used by ``biceps_cmdln`` to:
 - Apply temporal masks
 - Correctly compute frame counts and frame-based thresholds
 
----
+
 
 **Summary of Required Files per Run**
 -------------------------------------
@@ -529,7 +540,7 @@ This file is used by ``biceps_cmdln`` to:
    If any required files are missing, ``biceps_cmdln`` will fail to process that run.  
    The **Python wrapper** can assist by **detecting and patching missing variance files** automatically.
 
----
+
 
 
 Arguments
@@ -538,7 +549,7 @@ Arguments
 ``biceps_cmdln`` can be run with **one positional argument** (input)  
 followed by **optional key/value flags** for customization.
 
----
+
 
 Positional Argument
 -------------------
@@ -625,8 +636,41 @@ The table below summarizes available flags:
 - Even with `-outlier 0`, variance files (`_variance.txt`) **must exist**.  
 - Using `-minutes` < 8 may require fixing the known bug in some versions.  
 
----
 
+
+.. _calculating_dense_connectivity_matrices:
+
+Calculating Dense Connectivity Matrices
+----------------------------------------
+
+Dense connectivity matrices store vertex- or voxel-wise correlations across the brain, rather than parcel-averaged values.  
+They are much larger than parcellated matrices but preserve the full spatial resolution of the input data.
+
+**When to use:**  
+- Required if you need `.dconn.nii` outputs for vertex-level analyses.  
+- Useful for generating high-resolution network visualizations or running analyses that cannot be performed on parcellated data.
+
+**How to enable:**  
+- Add the ``-make_dense_conns 1`` flag to your BICEPS command.
+
+**Requirements:**  
+- Matching `.ptseries.nii` files must be available for all runs to be processed.  
+- If subject-specific smoothing is desired, supply:
+  - ``-left_hem_surface`` = path to left hemisphere midthickness surface
+  - ``-right_hem_surface`` = path to right hemisphere midthickness surface
+- Otherwise, BICEPS will use the fslr template surfaces.
+
+**Optional settings:**  
+- ``-dtseries_smoothing <sigma_mm>`` - Apply Gaussian smoothing (sigma in mm) to the dense data before correlation.  
+- ``-save_bids 1`` - Save dense connectivity outputs in BIDS format alongside standard BICEPS outputs.
+
+**Outputs:**  
+- One `.dconn.nii` file per parcellation/dataset processed.  
+- Output location matches your ``-out_dir`` setting (and ``bids/`` subdirectory if ``-save_bids`` is used).
+
+**Notes:**  
+- Dense matrices are very large in memory; ensure you have sufficient RAM and disk space.  
+- Processing time can be significantly longer compared to parcellated matrices.
 
 Expected Outputs
 ================
@@ -637,7 +681,7 @@ Two main formats are produced:
 1. **Standard formatting** (always created)
 2. **BIDS formatting** (if `-save_bids` or certain flags are used)
 
----
+
 
 Standard Formatting
 -------------------
@@ -679,7 +723,7 @@ Standard Formatting
    If you launch processing via the **GUI**, the list of included subjects  
    is saved next to the **input file list** you selected, not in the output folder.
 
----
+
 
 
 Standard Output Files
@@ -738,9 +782,10 @@ a **bids/** folder is also created next to **standard/**.
                     +-- sub-01_ses-01_task-rest_smoothing-15mm_frames-MaxGroup_bold_timeseries.dtseries.nii
                     +-- sub-01_ses-01_task-rest_smoothing-15mm_frames-MaxGroup_bold_timeseries_desc-conn.dconn.nii
 
----
 
-### BIDS Output File Types
+
+BIDS Output File Types
+~~~~~~~~~~~~~~~~~~~~~~
 
 - **`.mat`** -> `ind_fconn` (<m,m>), single-session connectivity matrix
 - **`.json`** -> metadata (subject, session, frames used, FD threshold, skip volumes)
@@ -752,7 +797,7 @@ a **bids/** folder is also created next to **standard/**.
    and **settings** as the parcellated matrices.  
    The `.json` files from the parcellated outputs describe the parameters used.
 
----
+
 
 **Summary:**
 
