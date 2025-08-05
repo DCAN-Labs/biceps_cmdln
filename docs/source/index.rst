@@ -98,6 +98,123 @@ For clarity:
 - **FD**: Framewise Displacement (used to assess motion)
 
 
+Organization Requirements for Running biceps_cmdln
+==================================================
+
+``biceps_cmdln`` requires a specific **data organization and file structure** to function properly.  
+If these requirements are not met, you may need to:
+
+- Reformat your data to meet the requirements, **or**
+- Use another pipeline to compute connectivity matrices.
+
+Below are the required components:
+
+
+
+1. General BIDS Derivatives Structure with Session Folders
+----------------------------------------------------------
+
+``biceps_cmdln`` expects your fMRI data to be organized in a **BIDS Derivatives-like** hierarchy with:
+
+- **Study folder** contains subject folders
+- **Subject folder** contains session folders
+- **Session folder** contains `func` folder with denoised fMRI outputs
+
+**Important:** Unlike standard BIDS, ``biceps_cmdln`` **requires** a session structure  
+(`ses-xx`) even if you only have a single session per subject.
+
+**Example folder structure:** ::
+
+    /study_dir/
+        sub-01/
+            ses-01/
+                func/
+                    <fMRI output files>
+
+
+
+2. Parcellated Timeseries Files (`.ptseries.nii`)
+-------------------------------------------------
+
+Each **subject/session** must have at least one **CIFTI parcellated timeseries file**:
+
+- File extension: `.ptseries.nii`
+- File name should contain a **parcellation key**, such as: ::
+
+    sub-01_ses-01_task-rest_roi-Gordon2014FreeSurferSubcortical_ptseries.nii
+
+``biceps_cmdln`` uses this key (the `roi-<parcellation>` portion) to:
+
+- Detect available parcellation schemes
+- Generate connectivity matrices for **each parcellation**
+
+
+
+3. Signal Variance Files (`_variance.txt`)
+------------------------------------------
+
+Each **concatenated run** requires a corresponding **variance file**:
+
+- File extension: `_variance.txt`
+- Filename should start with **subject, session, and task identifiers**, for example: ::
+
+    sub-01_ses-01_task-rest_variance.txt
+
+- Each row contains a **signal variance value per frame**
+
+**Purpose in biceps_cmdln:**
+
+- Frames exceeding **3 scaled median absolute deviations** are considered **outliers**
+- Even if **outlier removal is disabled** (`-outlier 0`),  
+  the `_variance.txt` files **must still exist**
+
+**If `_variance.txt` files are stored elsewhere:**
+
+- Place all variance files in a single folder
+- Pass this folder to ``biceps_cmdln`` using the ``-custom_dtvar_folder`` flag
+
+
+
+4. Motion and TR Information (`_mask.mat`)
+------------------------------------------
+
+Each run also requires a **MATLAB `.mat` file** containing:
+
+- **Framewise motion mask** (which frames are high-motion)
+- **Repetition Time (TR)** of the scan
+
+File naming convention: ::
+
+    sub-01_ses-01_task-rest_mask.mat
+
+This file is used by ``biceps_cmdln`` to:
+
+- Apply temporal masks
+- Correctly compute frame counts and frame-based thresholds
+
+
+
+**Summary of Required Files per Run**
+-------------------------------------
+
+- **Python Wrapper**  
+  - **Best for:** Most users, scripting, CLI flags, automation  
+  - **Requires MATLAB?** Yes (runs behind the scenes)
+
+- **Singularity**  
+  - **Best for:** Reproducibility, no MATLAB installation, HPC/container environments  
+  - **Requires MATLAB?** No
+
+- **Native MATLAB**  
+  - **Best for:** Development, debugging, full customization, GUI mode  
+  - **Requires MATLAB?** Yes (interactive use)
+
+.. note::
+
+   If any required files are missing, ``biceps_cmdln`` will fail to process that run.  
+   The **Python wrapper** can assist by **detecting and patching missing variance files** automatically.
+
+
 Downloading biceps_cmdln
 =========================
 
@@ -424,124 +541,6 @@ Example: ::
 - **GUI** -> Use only for legacy workflows or interactive visualization
 
 
-Organization Requirements for Running biceps_cmdln
-==================================================
-
-``biceps_cmdln`` requires a specific **data organization and file structure** to function properly.  
-If these requirements are not met, you may need to:
-
-- Reformat your data to meet the requirements, **or**
-- Use another pipeline to compute connectivity matrices.
-
-Below are the required components:
-
-
-
-1. General BIDS Derivatives Structure with Session Folders
-----------------------------------------------------------
-
-``biceps_cmdln`` expects your fMRI data to be organized in a **BIDS Derivatives-like** hierarchy with:
-
-- **Study folder**  contains subject folders
-- **Subject folder**  contains session folders
-- **Session folder**  contains `func` folder with denoised fMRI outputs
-
-**Important:** Unlike standard BIDS, ``biceps_cmdln`` **requires** a session structure  
-(`ses-xx`) even if you only have a single session per subject.
-
-**Example folder structure:** ::
-
-    /study_dir/
-        sub-01/
-            ses-01/
-                func/
-                    <fMRI output files>
-
-
-
-2. Parcellated Timeseries Files (`.ptseries.nii`)
--------------------------------------------------
-
-Each **subject/session** must have at least one **CIFTI parcellated timeseries file**:
-
-- File extension: `.ptseries.nii`
-- File name should contain a **parcellation key**, such as: ::
-
-    sub-01_ses-01_task-rest_roi-Gordon2014FreeSurferSubcortical_ptseries.nii
-
-``biceps_cmdln`` uses this key (the `roi-<parcellation>` portion) to:
-
-- Detect available parcellation schemes
-- Generate connectivity matrices for **each parcellation**
-
-
-
-3. Signal Variance Files (`_variance.txt`)
-------------------------------------------
-
-Each **concatenated run** requires a corresponding **variance file**:
-
-- File extension: `_variance.txt`
-- Filename should start with **subject, session, and task identifiers**, for example: ::
-
-    sub-01_ses-01_task-rest_variance.txt
-
-- Each row contains a **signal variance value per frame**
-
-**Purpose in biceps_cmdln:**
-
-- Frames exceeding **3 scaled median absolute deviations** are considered **outliers**
-- Even if **outlier removal is disabled** (`-outlier 0`),  
-  the `_variance.txt` files **must still exist**
-
-**If `_variance.txt` files are stored elsewhere:**
-
-- Place all variance files in a single folder
-- Pass this folder to ``biceps_cmdln`` using the ``-custom_dtvar_folder`` flag
-
-
-
-4. Motion and TR Information (`_mask.mat`)
-------------------------------------------
-
-Each run also requires a **MATLAB `.mat` file** containing:
-
-- **Framewise motion mask** (which frames are high-motion)
-- **Repetition Time (TR)** of the scan
-
-File naming convention: ::
-
-    sub-01_ses-01_task-rest_mask.mat
-
-This file is used by ``biceps_cmdln`` to:
-
-- Apply temporal masks
-- Correctly compute frame counts and frame-based thresholds
-
-
-
-**Summary of Required Files per Run**
--------------------------------------
-
-- **Python Wrapper**  
-  - **Best for:** Most users, scripting, CLI flags, automation  
-  - **Requires MATLAB?** Yes (runs behind the scenes)
-
-- **Singularity**  
-  - **Best for:** Reproducibility, no MATLAB installation, HPC/container environments  
-  - **Requires MATLAB?** No
-
-- **Native MATLAB**  
-  - **Best for:** Development, debugging, full customization, GUI mode  
-  - **Requires MATLAB?** Yes (interactive use)
-
-.. note::
-
-   If any required files are missing, ``biceps_cmdln`` will fail to process that run.  
-   The **Python wrapper** can assist by **detecting and patching missing variance files** automatically.
-
-
-
 Command-Line Arguments
 ======================
 
@@ -859,6 +858,9 @@ BIDS Output File Types
 Troubleshooting
 ===============
 
+LD Library Path cache issues
+----------------------------
+
 If you see the text listed below after starting up the containerized version of biceps_cmdln
 and after several minutes no additional text has appeared, it is possible that the cache
 directory created by matlab compiler runtime in your home directory is preventing the application
@@ -867,3 +869,32 @@ and delete it from your system. Alternatively you should be able to export a new
 to the container during processing, and this may also solve the issue. ::
 
     LD_LIBRARY_PATH is .:/mcr_path/v912/runtime/glnxa64:/mcr_path/v912/bin/glnxa64:/mcr_path/v912/sys/os/glnxa64:/mcr_path/v912/sys/opengl/lib/glnxa64
+
+
+Index exceeds the number of array elements
+------------------------------------------
+
+**Error message:**
+
+.. code-block:: none
+
+    Index exceeds the number of array elements. Index must not exceed ###.
+
+    Error in make_outliers_mask (line 27)
+        idx_mask_std = isthisanoutlier(dtseries_var(inc_idx_std),'median');
+
+    Error in subf_pushbutton_scout_motion_Callback (line 117)
+        handles = make_outliers_mask(handles);
+
+    Error in biceps_cmdln (line 232)
+        handles = subf_pushbutton_scout_motion_Callback(handles, 0);
+
+**Cause:**  
+This error usually occurs when the ``.mat`` files contain **different frame counts** across subjects (i.e., varying TRs or number of timepoints).
+
+**Solution:**  
+Split your subjects into **separate file lists** grouped by matching TR and frame count combinations.  
+Run each list separately to avoid misaligned matrix dimensions.
+
+**Tip:**  
+You can validate frame counts automatically before running by using the ``-validate_frame_counts 1`` flag to detect mismatches early.
