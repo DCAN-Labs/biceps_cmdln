@@ -194,8 +194,8 @@ This file is used by ``biceps_cmdln`` to:
 
 
 
-**Summary of Required Files per Run**
--------------------------------------
+**Summary of Differences Between Ways to Run biceps_cmdln**
+-----------------------------------------------------------
 
 - **Python Wrapper**  
   - **Best for:** Most users, scripting, CLI flags, automation  
@@ -365,24 +365,6 @@ Options:
 
 - Edit the default inside `biceps_cmdln.m`
 - Use the ``--wb_command_path`` flag at runtime
-
-
-
-Summary of Usage Options
-------------------------
-
-- **Python Wrapper**  
-  - **Best for:** Most users, scripting, CLI flags, automation  
-  - **Requires MATLAB?** Yes (runs behind the scenes)
-
-- **Singularity**  
-  - **Best for:** Reproducibility, no MATLAB installation, HPC/container environments  
-  - **Requires MATLAB?** No
-
-- **Native MATLAB**  
-  - **Best for:** Development, debugging, full customization, GUI mode  
-  - **Requires MATLAB?** Yes (interactive use)
-
 
 
 Ways of Running biceps_cmdln
